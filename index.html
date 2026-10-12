@@ -45,9 +45,9 @@ main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 
 /* ---------- Rad ---------- */
 .stage{max-width:760px;margin:0 auto;background:var(--paper)}
-.stage svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.stage svg{display:block;width:100%;height:auto;aspect-ratio:1000/810;touch-action:manipulation}
 .rad.detail .stage{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;height:36vh;min-height:220px;max-height:360px;border-bottom:1px solid var(--line)}
-.rad.detail .stage svg{height:100%}
+.rad.detail .stage svg{height:100%;aspect-ratio:auto}
 .hint{max-width:760px;margin:0 auto;padding:0 18px;color:var(--ink2);font-size:14px}
 .rad.detail .hint{display:none}
 
@@ -830,6 +830,16 @@ function animVB(to){
     setVB(from.map((f,i)=>f+(to[i]-f)*k));if(k<1)animVB.raf=requestAnimationFrame(step)};
   animVB.raf=requestAnimationFrame(step);
 }
+/* Wechselt die Bühnengröße (Übersicht <-> Detail), den sichtbaren Ausschnitt
+   im gleichen Maßstab halten – sonst springt das Bild erst und zoomt dann. */
+function keepScale(before){
+  const after=stage.getBoundingClientRect();
+  if(!before.width||!after.width)return;
+  const upp=vb[2]/before.width;
+  const w=after.width*upp,h=after.height*upp;
+  const cx=vb[0]+vb[2]/2,cy=vb[1]+vb[3]/2;
+  setVB([cx-w/2,cy-h/2,w,h]);
+}
 function targetFor(p){
   const r=stage.getBoundingClientRect();const a=r.height/Math.max(1,r.width);
   const w=p.zw||320,h=w*a;return [p.z[0]-w/2,p.z[1]-h/2,w,h];
@@ -933,13 +943,18 @@ function route(){
   document.querySelectorAll('.tabs button[aria-current]').forEach(b=>b.setAttribute('aria-current','page'));
   if(vid==='v-rad'){
     const p=byId[h[1]];const rad=$('#v-rad');
+    const wasDetail=rad.classList.contains('detail');
+    const before=stage.getBoundingClientRect();
     if(p){
       const changed=current!==p.id;current=p.id;
       rad.classList.add('detail');renderDetail(p);highlight(p.id);
-      requestAnimationFrame(()=>animVB(targetFor(p)));
       if(changed)window.scrollTo(0,0);
+      if(!wasDetail)keepScale(before);
+      animVB(targetFor(p));
     }else{
-      current=null;rad.classList.remove('detail');renderOverview();highlight(null);animVB(BASE);
+      current=null;rad.classList.remove('detail');renderOverview();highlight(null);
+      if(wasDetail)keepScale(before);
+      animVB(BASE);
     }
   }
   if(vid==='v-insp')renderInsp();

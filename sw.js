@@ -1,5 +1,5 @@
 // Fahrrad-Werkstatt – Offline-Cache. Bei Änderungen an index.html die Versionsnummer erhöhen.
-const CACHE = 'werkstatt-v2';
+const CACHE = 'werkstatt-v3';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
