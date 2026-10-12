@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fahrrad-Werkstatt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEEE9; --sheet:#F8F9F6; --ink:#1D2528; --ink2:#566166; --line:#C8CDC6;
+  --sig:#F2B705; --hl:#D39300; --steel:#2C6670; --warn:#A33B2C; --warnbg:#F3E3DF;
+  --cond:"Barlow Condensed","Avenir Next Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#14181A; --sheet:#1D2327; --ink:#E4E8E2; --ink2:#9AA6A9; --line:#343C40;
+    --hl:#F2B705; --steel:#7FBFC4; --warn:#E58474; --warnbg:#2E1F1C; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14181A; --sheet:#1D2327; --ink:#E4E8E2; --ink2:#9AA6A9; --line:#343C40;
+  --hl:#F2B705; --steel:#7FBFC4; --warn:#E58474; --warnbg:#2E1F1C; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.55 var(--body);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--cond);line-height:1.1;margin:0}
+a{color:var(--steel)}
+:focus-visible{outline:3px solid var(--steel);outline-offset:2px}
+
+.top{max-width:760px;margin:0 auto;padding:14px 18px 4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.top h1{font-size:26px;font-weight:700;letter-spacing:.01em}
+.top p{margin:0;color:var(--ink2);font-size:14px}
+
+main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.view[hidden]{display:none}
+
+/* ---------- Rad ---------- */
+.stage{max-width:760px;margin:0 auto;background:var(--paper)}
+.stage svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.rad.detail .stage{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;height:36vh;min-height:220px;max-height:360px;border-bottom:1px solid var(--line)}
+.rad.detail .stage svg{height:100%}
+.hint{max-width:760px;margin:0 auto;padding:0 18px;color:var(--ink2);font-size:14px}
+.rad.detail .hint{display:none}
+
+svg .part{color:var(--ink);cursor:pointer;transition:color .2s}
+svg .part.on{color:var(--hl);filter:drop-shadow(0 0 5px rgba(242,183,5,.75))}
+svg .ground{stroke:var(--line);stroke-width:3}
+svg .spk{stroke:currentColor;stroke-width:1.6;opacity:.55}
+svg .lead{stroke:var(--ink2);stroke-width:2}
+svg .dot{fill:var(--sheet);stroke:var(--ink);stroke-width:3;cursor:pointer}
+svg .dot.on{fill:var(--sig);stroke-width:4}
+svg .lbl{cursor:pointer}
+svg .lbl rect{fill:var(--sheet);stroke:var(--ink);stroke-width:2}
+svg .lbl text{font-family:var(--cond);font-weight:600;font-size:34px;fill:var(--ink)}
+svg .lbl.on rect{fill:var(--sig)}
+svg .lbl.on text{fill:#1D2528}
+.rad.detail svg .lbl,.rad.detail svg .lead{display:none}
+.rad:not(.detail) svg .dot{display:none}
+
+.panel{max-width:760px;margin:0 auto;padding:12px 18px 24px}
+.groups h2{font-size:15px;font-weight:600;color:var(--ink2);margin:22px 0 6px;font-family:var(--body)}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.rows li{border-bottom:1px solid var(--line)}
+.rows button{all:unset;box-sizing:border-box;display:flex;width:100%;padding:12px 2px;gap:12px;align-items:center;cursor:pointer}
+.rows button:focus-visible{outline:3px solid var(--steel)}
+.rows .nm{font-family:var(--cond);font-weight:600;font-size:21px;flex:0 0 auto}
+.rows .ds{color:var(--ink2);font-size:14px;flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rows svg{flex:0 0 auto;color:var(--ink2)}
+.disclaimer{margin-top:26px;font-size:13px;color:var(--ink2);border-left:3px solid var(--line);padding-left:12px}
+
+.dhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:4px 0 14px}
+.dhead .grp{margin:0;color:var(--ink2);font-size:14px}
+.dhead h2{font-size:34px;font-weight:700}
+.back{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:7px 14px;font-size:15px;cursor:pointer;flex:0 0 auto}
+
+.seg{display:flex;background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px;margin-bottom:16px}
+.seg button{flex:1;border:0;background:none;padding:9px 4px;border-radius:9px;font-weight:600;cursor:pointer;font-size:15px}
+.seg button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+
+.tabbody h3{font-size:21px;font-weight:600;margin:20px 0 6px}
+.tabbody p{margin:0 0 10px;max-width:68ch}
+.tabbody ul{margin:0;padding-left:20px}
+.tabbody li{margin:4px 0}
+.lead-p{font-size:18px}
+
+details.task{background:var(--sheet);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+details.task summary{list-style:none;padding:13px 14px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tt{font-family:var(--cond);font-weight:600;font-size:20px}
+details.task summary .iv{grid-column:1/-1;color:var(--ink2);font-size:14px}
+details.task[open] summary{border-bottom:1px solid var(--line)}
+.tbody{padding:12px 14px 14px}
+.tbody ol{margin:0 0 12px;padding-left:22px}
+.tbody ol li{margin:6px 0;padding-left:2px}
+.note{background:var(--paper);border-radius:10px;padding:10px 12px;font-size:15px;margin-top:10px}
+.shop{border:2px solid var(--warn);background:var(--warnbg);border-radius:14px;padding:12px 14px;margin-top:18px}
+.shop h3{color:var(--warn);margin-top:0;font-size:19px}
+.shop p{margin:0}
+
+.lv{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;white-space:nowrap}
+.lv i{display:inline-block;width:8px;height:14px;border-radius:2px;background:var(--line)}
+.lv span{display:inline-flex;gap:2px}
+.lv1 i:nth-child(-n+1),.lv2 i:nth-child(-n+2),.lv3 i:nth-child(-n+3){background:var(--ink)}
+.lv3{color:var(--warn)} .lv3 i:nth-child(-n+3){background:var(--warn)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 11px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip.have::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--steel)}
+.chips-l{font-size:14px;color:var(--ink2);margin:8px 0 0}
+
+.term{border:0;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline dotted var(--steel);text-decoration-thickness:2px;text-underline-offset:3px;cursor:help}
+
+.dfoot{margin-top:26px;display:grid;gap:10px}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:12px;padding:11px 14px;font-weight:600;cursor:pointer;font-size:15px}
+.btn.ghost{background:var(--sheet);color:var(--ink);border-color:var(--line)}
+.pn{display:flex;gap:10px}
+.pn .btn{flex:1;font-family:var(--cond);font-size:17px}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+
+/* checkbox lists */
+.cl{list-style:none;padding:0;margin:0}
+.cl li{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line)}
+.cl li:last-child{border-bottom:0}
+.cl input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--steel);flex:0 0 auto}
+.cl label{flex:1;cursor:pointer}
+.cl small{display:block;color:var(--ink2);font-size:14px}
+
+/* ---------- Inspektion ---------- */
+.vhead{max-width:760px;margin:0 auto;padding:6px 18px 0}
+.vhead h2{font-size:32px;font-weight:700}
+.vhead p{color:var(--ink2);max-width:62ch;margin:6px 0 0}
+.prog{height:10px;background:var(--sheet);border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:14px 0 4px}
+.prog div{height:100%;background:var(--sig);transition:width .25s}
+.progt{font-size:14px;color:var(--ink2)}
+details.step{background:var(--sheet);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+details.step summary{list-style:none;cursor:pointer;display:flex;gap:12px;align-items:center;padding:12px 14px}
+details.step summary::-webkit-details-marker{display:none}
+.num{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-family:var(--cond);font-weight:700;font-size:18px}
+details.step.done .num{background:var(--sig);border-color:var(--sig);color:#1D2528}
+.st{flex:1}
+.st b{display:block;font-family:var(--cond);font-weight:600;font-size:20px;line-height:1.15}
+.st small{color:var(--ink2);font-size:14px}
+.sbody{padding:4px 14px 14px;border-top:1px solid var(--line)}
+.links{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.links .chip{background:var(--sheet);border-color:var(--steel);color:var(--steel);font-weight:600}
+
+/* ---------- Werkzeug / Begriffe ---------- */
+.tsec h3{font-size:22px;font-weight:600;margin:24px 0 2px}
+.tsec > p{margin:0 0 6px;color:var(--ink2);font-size:14px}
+.gl dt{font-family:var(--cond);font-weight:600;font-size:21px;margin-top:16px}
+.gl dd{margin:2px 0 0;max-width:66ch}
+
+/* ---------- Nav ---------- */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--sheet);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs .in{display:flex;width:100%;max-width:760px}
+.tabs button{flex:1;border:0;background:none;padding:8px 2px 9px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer}
+.tabs button svg{width:24px;height:24px}
+.tabs button[aria-current="page"]{color:var(--ink)}
+.tabs button[aria-current="page"] svg{color:var(--hl)}
+
+/* ---------- Sheet & Toast ---------- */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--sheet);border-radius:18px 18px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:80vh;overflow:auto;max-width:760px;margin:0 auto;box-shadow:0 -6px 30px rgba(0,0,0,.18)}
+.sheet h3{font-size:24px;font-weight:600;margin-bottom:6px}
+.sheet p{margin:0 0 12px}
+.sheet textarea{width:100%;height:42vh;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--paper);color:var(--ink)}
+.scrim[hidden],.sheet[hidden]{display:none}
+.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:999px;font-weight:600;z-index:50;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (min-width:900px){
+  .rad.detail .stage{height:44vh;max-height:460px}
+}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ECEEE9">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+<header class="top">
+  <h1>Fahrrad-Werkstatt</h1>
+  <p>für Gravel- und Rennräder</p>
+</header>
+
+<main>
+  <!-- ===================== RAD ===================== -->
+  <section class="view rad" id="v-rad">
+    <div class="stage" id="stage">
+      <svg id="bike" viewBox="0 0 1000 810" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Schematische Seitenansicht eines Gravelbikes mit tippbaren Bauteilen">
+        <line class="ground" x1="0" y1="722" x2="1000" y2="722"/>
+
+        <g class="part" id="g-laufrad" data-part="laufrad">
+          <g id="spokesR"></g><g id="spokesF"></g>
+          <circle cx="215" cy="530" r="165" fill="none" stroke="currentColor" stroke-width="10"/>
+          <circle cx="785" cy="530" r="165" fill="none" stroke="currentColor" stroke-width="10"/>
+          <circle cx="215" cy="530" r="15" fill="currentColor"/>
+          <circle cx="785" cy="530" r="15" fill="currentColor"/>
+        </g>
+
+        <g class="part" id="g-reifen" data-part="reifen">
+          <circle cx="215" cy="530" r="181" fill="none" stroke="currentColor" stroke-width="22" opacity=".9"/>
+          <circle cx="785" cy="530" r="181" fill="none" stroke="currentColor" stroke-width="22" opacity=".9"/>
+          <circle cx="215" cy="530" r="193" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="3 8"/>
+          <circle cx="785" cy="530" r="193" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="3 8"/>
+          <rect x="211" y="364" width="8" height="20" rx="2" fill="currentColor"/>
+        </g>
+
+        <g class="part" id="g-bremse" data-part="bremse">
+          <circle cx="785" cy="530" r="44" fill="none" stroke="currentColor" stroke-width="5"/>
+          <circle cx="785" cy="530" r="34" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="5 6"/>
+          <circle cx="785" cy="530" r="22" fill="none" stroke="currentColor" stroke-width="3"/>
+          <rect x="-19" y="-11" width="38" height="22" rx="6" fill="currentColor" transform="translate(745,491) rotate(62)"/>
+          <rect x="-19" y="-11" width="38" height="22" rx="6" fill="currentColor" transform="translate(258,503) rotate(-12)"/>
+          <path d="M744,478 Q716,408 694,336" fill="none" stroke="currentColor" stroke-width="3.5"/>
+          <path d="M262,494 Q350,520 440,556" fill="none" stroke="currentColor" stroke-width="3"/>
+        </g>
+
+        <g class="part" id="g-rahmen" data-part="rahmen" stroke="currentColor" stroke-linecap="round">
+          <line x1="450" y1="568" x2="215" y2="530" stroke-width="13"/>
+          <line x1="215" y1="530" x2="378" y2="326" stroke-width="10"/>
+          <line x1="450" y1="568" x2="369" y2="294" stroke-width="18"/>
+          <line x1="381" y1="335" x2="664" y2="258" stroke-width="16"/>
+          <line x1="450" y1="568" x2="684" y2="312" stroke-width="22"/>
+          <line x1="662" y1="244" x2="689" y2="322" stroke-width="27" stroke-linecap="butt"/>
+          <circle cx="215" cy="530" r="12" fill="currentColor" stroke="none"/>
+        </g>
+
+        <g class="part" id="g-gabel" data-part="gabel">
+          <path d="M688,320 Q742,414 785,530" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round"/>
+          <circle cx="785" cy="530" r="10" fill="currentColor"/>
+        </g>
+
+        <g class="part" id="g-kassette" data-part="kassette" fill="none" stroke="currentColor" stroke-width="3">
+          <circle cx="215" cy="530" r="19"/><circle cx="215" cy="530" r="24"/><circle cx="215" cy="530" r="29"/>
+          <circle cx="215" cy="530" r="34"/><circle cx="215" cy="530" r="39"/><circle cx="215" cy="530" r="44"/>
+          <circle cx="215" cy="530" r="49"/><circle cx="215" cy="530" r="54"/>
+        </g>
+
+        <g class="part" id="g-kurbel" data-part="kurbel">
+          <circle cx="450" cy="568" r="46" fill="none" stroke="currentColor" stroke-width="7"/>
+          <circle cx="450" cy="568" r="51" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="3 4"/>
+          <line x1="450" y1="568" x2="528" y2="616" stroke="currentColor" stroke-width="15" stroke-linecap="round"/>
+        </g>
+
+        <g class="part" id="g-kette" data-part="kette" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="7 3">
+          <path d="M450,517 L215,497"/>
+          <path d="M450,619 L208,644 M198,634 L222,578 L212,564"/>
+        </g>
+
+        <g class="part" id="g-schaltwerk" data-part="schaltwerk">
+          <path d="M218,534 L244,552 L250,572 L234,580 L222,560 Z" fill="currentColor"/>
+          <path d="M228,568 L246,582 L218,648 L196,636 Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+          <circle cx="232" cy="578" r="9" fill="var(--paper)" stroke="currentColor" stroke-width="4"/>
+          <circle cx="208" cy="634" r="9" fill="var(--paper)" stroke="currentColor" stroke-width="4"/>
+        </g>
+
+        <g class="part" id="g-tretlager" data-part="tretlager">
+          <circle cx="450" cy="568" r="18" fill="currentColor"/>
+          <circle cx="450" cy="568" r="7" fill="var(--paper)"/>
+        </g>
+
+        <g class="part" id="g-pedal" data-part="pedal">
+          <rect x="506" y="609" width="44" height="15" rx="4" fill="currentColor"/>
+          <circle cx="528" cy="616" r="5" fill="var(--paper)"/>
+        </g>
+
+        <g class="part" id="g-steuersatz" data-part="steuersatz">
+          <rect x="-20" y="-6" width="40" height="12" rx="3" fill="currentColor" transform="translate(660,239) rotate(-19)"/>
+          <rect x="-20" y="-6" width="40" height="12" rx="3" fill="currentColor" transform="translate(691,327) rotate(-19)"/>
+        </g>
+
+        <g class="part" id="g-vorbau" data-part="vorbau">
+          <rect x="-15" y="-8" width="30" height="16" rx="2" fill="currentColor" opacity=".8" transform="translate(656,226) rotate(-19)"/>
+          <rect x="-13" y="-4" width="26" height="8" rx="2" fill="currentColor" transform="translate(651,210) rotate(-19)"/>
+          <line x1="652" y1="219" x2="712" y2="214" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
+          <circle cx="712" cy="214" r="13" fill="currentColor"/>
+        </g>
+
+        <g class="part" id="g-lenker" data-part="lenker">
+          <path d="M712,214 C738,212 762,212 778,222 C796,234 800,268 788,286 C780,298 762,300 748,296" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+        </g>
+
+        <g class="part" id="g-hebel" data-part="hebel">
+          <path d="M766,231 C742,254 708,248 686,272" fill="none" stroke="currentColor" stroke-width="4"/>
+          <path d="M770,233 C750,262 716,262 692,286" fill="none" stroke="currentColor" stroke-width="4"/>
+          <path d="M757,214 C766,199 790,201 797,213 L801,228 C792,235 777,233 767,229 Z" fill="currentColor"/>
+          <path d="M797,226 C805,252 809,282 803,306" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+        </g>
+
+        <g class="part" id="g-stuetze" data-part="stuetze">
+          <line x1="369" y1="294" x2="346" y2="214" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+          <rect x="-14" y="-6" width="28" height="12" rx="2" fill="currentColor" transform="translate(372,302) rotate(-16)"/>
+        </g>
+
+        <g class="part" id="g-sattel" data-part="sattel">
+          <path d="M282,206 C296,194 336,192 368,195 L408,202 C414,206 408,212 396,213 L300,218 C286,218 278,212 282,206 Z" fill="currentColor"/>
+          <line x1="318" y1="220" x2="374" y2="215" stroke="currentColor" stroke-width="4"/>
+          <rect x="337" y="208" width="18" height="12" rx="2" fill="currentColor"/>
+        </g>
+
+        <g id="labels"></g>
+      </svg>
+    </div>
+    <p class="hint" id="hint">Tippe auf ein Bauteil oder seine Beschriftung.</p>
+    <div class="panel" id="panel"></div>
+  </section>
+
+  <!-- ===================== INSPEKTION ===================== -->
+  <section class="view" id="v-insp" hidden></section>
+  <!-- ===================== WERKZEUG ===================== -->
+  <section class="view" id="v-tools" hidden></section>
+  <!-- ===================== BEGRIFFE ===================== -->
+  <section class="view" id="v-gloss" hidden></section>
+</main>
+
+<nav class="tabs" aria-label="Bereiche">
+  <div class="in">
+    <button data-go="#/rad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="16" r="3.5"/><circle cx="18.5" cy="16" r="3.5"/><path d="M5.5 16 9 9h7l2.5 7M9 9l3 7h-6.5M15 6h2.5l-1.5 3"/></svg>Rad</button>
+    <button data-go="#/inspektion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M8.5 11l2 2 4-4M8.5 17h7"/></svg>Inspektion</button>
+    <button data-go="#/werkzeug"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5a4 4 0 0 0 5 5l-9 9a2.1 2.1 0 0 1-3-3l9-9a4 4 0 0 0-2-2z"/><path d="m18 3-2.5 2.5L16 8l2.5.5L21 6"/></svg>Werkzeug</button>
+    <button data-go="#/begriffe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg>Begriffe</button>
+  </div>
+</nav>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ======================= DATEN ======================= */
+const KIND = {basis:'Grundausstattung', erweitert:'Für größere Arbeiten', werkstatt:'Eher Werkstatt'};
+const TOOLS = {
+  inbus:{n:'Innensechskant-Schlüssel (2–8 mm)',k:'basis',d:'Für fast alle Schrauben am Rad. Ein guter Satz mit Kugelkopf oder ein solides Multitool reicht für den Anfang.'},
+  torx:{n:'Torx T25',k:'basis',d:'Bei vielen 6-Loch-Bremsscheiben und manchen Kettenblatt- oder Klemmschrauben. Oft im Multitool enthalten.'},
+  drehmo:{n:'Drehmomentschlüssel (kleiner Bereich)',k:'basis',d:'Zieht Schrauben genau auf den Herstellerwert an. Pflicht bei Carbon, bei Alu sehr sinnvoll. Für Kassette und Innenlager braucht es meist einen Schlüssel mit größerem Bereich.'},
+  pumpe:{n:'Standpumpe mit Manometer',k:'basis',d:'Pumpt schnell und zeigt den Druck an. Auf den Ventiltyp achten (am Rennrad/Gravel meist Presta, auch „Sclaverand" oder „französisch" genannt).'},
+  heber:{n:'Reifenheber (Kunststoff)',k:'basis',d:'Zum Abnehmen des Reifens. Kunststoff schont die Felge.'},
+  schlauch:{n:'Ersatzschlauch und Flickzeug',k:'basis',d:'Passende Größe steht auf der Reifenflanke (z. B. 40-622). Ventillänge zur Felgenhöhe passend wählen.'},
+  kettenlehre:{n:'Kettenverschleißlehre',k:'basis',d:'Zeigt in Sekunden, ob die Kette gelängt ist. Günstig und spart teure Kassetten.'},
+  lappen:{n:'Lappen und Bürsten',k:'basis',d:'Für Kette, Kassette und Rahmen. Eine alte Zahnbürste ist für Schaltröllchen ideal.'},
+  reiniger:{n:'Fahrradreiniger / Entfetter',k:'basis',d:'Rahmenreiniger für den Rahmen, Entfetter für den Antrieb. Entfetter nicht auf Bremsbeläge und Scheiben.'},
+  oel:{n:'Kettenöl oder Kettenwachs',k:'basis',d:'Nass-Öl hält bei Regen länger, Trocken-Öl/Wachs zieht weniger Dreck an.'},
+  fett:{n:'Montagefett',k:'basis',d:'Gegen Festbacken und Knarzen an Gewinden und Metall-auf-Metall-Kontakt (nicht bei Carbon-Klemmungen).'},
+  iso:{n:'Isopropanol oder Bremsenreiniger',k:'basis',d:'Reinigt Bremsscheiben rückstandsfrei.'},
+  handschuhe:{n:'Einweghandschuhe (Nitril)',k:'basis',d:'Schützt die Hände und vor allem die Bremsen vor Fett von den Fingern.'},
+  kreuz:{n:'Kleiner Kreuzschlitz-Schraubendreher',k:'basis',d:'Viele Anschlagschrauben am Schaltwerk haben Kreuzschlitz.'},
+  klebeband:{n:'Klebe- oder Isolierband',k:'basis',d:'Zum Markieren von Sattelhöhe und Positionen und als Abschluss beim Lenkerband.'},
+  messschieber:{n:'Messschieber',k:'erweitert',d:'Für Bremsscheibendicke und Belagstärke. Ein günstiger reicht.'},
+  kettennieter:{n:'Kettennieter',k:'erweitert',d:'Zum Kürzen einer neuen Kette. Muss für die Gangzahl geeignet sein (11/12-fach-Ketten sind sehr schmal).'},
+  schlosszange:{n:'Kettenschlosszange',k:'erweitert',d:'Öffnet und schließt Kettenschlösser ohne Gefummel.'},
+  peitsche:{n:'Kettenpeitsche',k:'erweitert',d:'Hält die Kassette fest, während man den Verschlussring löst.'},
+  abzieher:{n:'Kassettenabzieher (passend zum System)',k:'erweitert',d:'Steckt im Verschlussring der Kassette. Shimano und SRAM nutzen teils unterschiedliche Profile – vor dem Kauf prüfen.'},
+  pedalschl:{n:'Pedalschlüssel (15 mm)',k:'erweitert',d:'Langer Hebel für fest sitzende Pedale. Viele Pedale lassen sich auch mit 6- oder 8-mm-Inbus von der Kurbelinnenseite lösen.'},
+  speichen:{n:'Speichenschlüssel (passende Größe)',k:'erweitert',d:'Für kleine Korrekturen am Rundlauf. Die Nippelgröße muss exakt passen.'},
+  zugschneider:{n:'Zug- und Hüllenschneider',k:'erweitert',d:'Schneidet Bowdenzüge sauber, ohne dass sie ausfransen.'},
+  kolben:{n:'Kolbenrücksteller',k:'erweitert',d:'Drückt die Bremskolben gerade zurück. Notfalls geht ein Kunststoff-Reifenheber – niemals Metall.'},
+  carbon:{n:'Carbon-Montagepaste',k:'erweitert',d:'Erhöht die Reibung, damit Carbonteile bei niedrigem Drehmoment halten. Nur nötig, wenn Rahmen, Stütze oder Lenker aus Carbon sind.'},
+  staender:{n:'Montageständer',k:'erweitert',d:'Macht die Arbeit deutlich angenehmer, ist aber kein Muss.'},
+  innenlager:{n:'Innenlagerwerkzeug',k:'werkstatt',d:'Systemspezifisch: Schlüssel für geschraubte Lager oder Auspresswerkzeug für Pressfit.'},
+  entlueft:{n:'Entlüftungskit',k:'werkstatt',d:'Herstellerspezifisch, inklusive passendem Bremsmedium (Mineralöl oder DOT).'},
+  schaltauge:{n:'Schaltaugen-Richtlehre',k:'werkstatt',d:'Misst und richtet ein verbogenes Schaltauge. Teuer und selten gebraucht.'},
+  zentrier:{n:'Zentrierständer',k:'werkstatt',d:'Für präzises Zentrieren von Laufrädern. Für gelegentliche Korrekturen geht es auch im Rahmen.'}
+};
+
+const GLOSS = {
+  'Schaltauge':'Kleines, austauschbares Metallteil zwischen Rahmen und Schaltwerk. Es verbiegt sich bei einem Sturz absichtlich zuerst und schützt so den Rahmen. Meist modellspezifisch – ein Ersatz-Schaltauge lohnt sich für längere Touren.',
+  'Schaltröllchen':'Die zwei kleinen Zahnräder im Schaltwerk. Das obere führt die Kette auf das gewählte Ritzel, das untere hält die Kette unter Spannung.',
+  'Steckachse':'Dicke Achse, die durch Ausfallende und Nabe geschraubt wird. Steifer und sicherer positioniert als ein Schnellspanner. Das Anzugsmoment steht meist auf der Achse.',
+  'Schnellspanner':'Ältere Radbefestigung mit dünner Achse und Hebel. Der Hebel muss sich beim Schließen deutlich schwer drücken lassen, sonst ist er zu locker.',
+  'Ahead-Steuersatz':'Heute übliche Bauart: Der Vorbau klemmt direkt auf den Gabelschaft. Die Schraube oben in der Kappe stellt nur das Lagerspiel ein – festgehalten wird alles von den Klemmschrauben des Vorbaus.',
+  'Spacer':'Distanzringe auf dem Gabelschaft unter oder über dem Vorbau. Durch Umsetzen ändert man die Lenkerhöhe.',
+  'Anschlagschrauben':'Zwei Schrauben am Schaltwerk, meist mit H (high, kleinstes Ritzel) und L (low, größtes Ritzel) beschriftet. Sie begrenzen, wie weit das Schaltwerk nach außen und innen darf, damit die Kette nicht herunterfällt oder in die Speichen gerät.',
+  'Zugspannung':'Wie straff der Schaltzug ist. Über eine Einstellschraube (am Schaltwerk, am Hebel oder im Zug) feinjustiert. Sie entscheidet, ob jeder Klick genau einen Gang sauber trifft.',
+  'B-Schraube':'Stellt den Abstand zwischen oberem Schaltröllchen und Kassette ein. Wichtig für sauberes Schalten auf den großen Ritzeln.',
+  'Druckpunkt':'Der Punkt, an dem der Bremshebel beim Ziehen „fest" wird. Er sollte immer an derselben Stelle liegen und der Hebel nie bis zum Lenker durchgehen.',
+  'Entlüften':'Luft aus einer hydraulischen Bremse entfernen und das Medium erneuern. Braucht ein passendes Kit, das richtige Medium und Sorgfalt.',
+  'Einbremsen':'Neue Beläge oder Scheiben brauchen einige kräftige Bremsungen, bis sie ihre volle Bremskraft erreichen. Mehrmals aus mittlerem Tempo deutlich bis fast zum Stillstand bremsen, ohne zu blockieren.',
+  'Mineralöl und DOT':'Die zwei Bremsflüssigkeiten bei hydraulischen Scheibenbremsen. Shimano nutzt Mineralöl, SRAM DOT-Flüssigkeit. Niemals mischen oder verwechseln – das zerstört die Dichtungen.',
+  'Kettenlängung':'Durch Verschleiß an Bolzen und Rollen wird die Kette effektiv länger. Eine gelängte Kette nutzt Kassette und Kettenblatt ab.',
+  '1x und 2x':'Anzahl der Kettenblätter vorne. 1x („eins-fach") hat nur ein Kettenblatt und keinen Umwerfer – einfacher, typisch für Gravel. 2x hat zwei Kettenblätter und einen Umwerfer.',
+  'Tubeless':'Reifen ohne Schlauch, abgedichtet mit Dichtmilch. Kleine Löcher verschließen sich oft selbst. Braucht passende Felgen, Felgenband und Ventile.',
+  'Felgenband':'Band im Felgenbett, das die Speichenlöcher abdeckt. Verrutscht oder beschädigt, kann es Platten von innen verursachen.',
+  'Newtonmeter':'Einheit für das Anzugsdrehmoment (Nm). Steht oft direkt auf dem Bauteil, z. B. „5 Nm max".',
+  'Freilauf':'Mechanismus in der Hinterradnabe, der beim Rollen ohne Treten das typische Klickern macht. Darauf sitzt die Kassette – Kassette und Freilaufkörper müssen zum gleichen Standard passen.',
+  'Pressfit':'Innenlager, das in den Rahmen eingepresst statt eingeschraubt wird. Ein- und Ausbau braucht Spezialwerkzeug.',
+  'Narrow-Wide':'Kettenblatt mit abwechselnd schmalen und breiten Zähnen. Hält die Kette bei 1x-Antrieben ohne Umwerfer zuverlässig.',
+  'Kupplung':'Mechanismus in vielen Gravel-Schaltwerken, der den Schaltwerkkäfig bremst. Verhindert Kettenschlagen und Abspringen auf Schotter. Zum Ausbauen des Hinterrads oft per Hebel oder Knopf lösbar.'
+};
+
+const PARTS = [
+ /* -------- ANTRIEB -------- */
+ {id:'kette',n:'Kette',g:'Antrieb',a:[340,511],l:[300,460],z:[330,575],zw:470,
+  short:'Überträgt deine Kraft aufs Hinterrad',
+  what:'Die Kette überträgt die Kraft vom Kettenblatt vorne auf die Ritzel hinten und damit aufs Hinterrad.',
+  how:'Sie besteht aus Gliedern mit Bolzen und Rollen. Je mehr Gänge, desto schmaler die Kette – eine 11-fach-Kette passt nur zu 11-fach. Verbunden wird sie meist mit einem Kettenschloss. Mit der Zeit längt sie sich ({{Kettenlängung}}) und schleift dann Kassette und Kettenblatt ab.',
+  wear:['Kettenverschleißlehre zeigt Längung über der Grenze','Einzelne steife Glieder (die Kette „springt" oder rattert)','Rost, Quietschen, trockenes Klackern','Kette rutscht unter Last durch, obwohl die Schaltung eingestellt ist'],
+  tasks:[
+   {t:'Reinigen und ölen',lv:1,iv:'nach Regenfahrten und regelmäßig, je nach Wetter alle paar hundert Kilometer',
+    steps:['Kette mit einem Lappen abziehen, während du die Pedale rückwärts drehst. Bei starkem Dreck vorher mit Entfetter einsprühen und abbürsten.','Gut trocknen lassen.','Pro Rolle einen Tropfen Öl auf die Innenseite der Kette geben, dabei langsam rückwärts kurbeln.','Ein paar Minuten einziehen lassen und dann außen gründlich abwischen. Das Öl gehört in die Kette, nicht drauf.'],
+    tools:['lappen','reiniger','oel','handschuhe'],
+    note:'Bremsscheiben dabei mit einem Tuch abdecken. Öl auf der Scheibe ruiniert die Bremsbeläge.'},
+   {t:'Verschleiß messen',lv:1,iv:'etwa jeden Monat und bei jeder Inspektion',
+    steps:['Kettenverschleißlehre zwischen zwei Rollen einsetzen und auf die Kette legen.','Grenzwerte: Für 11- und 12-fach-Ketten wird oft 0,5 % als Tauschgrenze genannt, für weniger Gänge eher 0,75 %. Was deine Lehre und dein Kettenhersteller angeben, hat Vorrang.','An zwei, drei Stellen messen.'],
+    tools:['kettenlehre'],
+    note:'Rechtzeitig tauschen spart Geld: Mit einer stark gelängten Kette nutzt sich die Kassette mit ab – dann springt auch die neue Kette, und beides muss getauscht werden.'},
+   {t:'Kette wechseln',lv:2,iv:'wenn die Verschleißgrenze erreicht ist',
+    steps:['Passende Kette (gleiche Gangzahl) und passendes Kettenschloss besorgen.','Hat dein Schaltwerk eine {{Kupplung}}, diese lösen. Alte Kette mit der Kettenschlosszange öffnen (oder mit dem Kettennieter trennen).','Neue Kette auf Länge bringen: Am einfachsten die Glieder der alten Kette zählen und gleich viele nehmen – nicht die Länge vergleichen, die alte ist ja gelängt. Hat die alte nie gepasst, Längenregel aus der Anleitung des Schaltwerks nutzen.','Kette einfädeln: vorne aufs Kettenblatt, hinten aufs kleinste Ritzel und durch beide {{Schaltröllchen}}. Bei beschrifteten Ketten auf die Laufrichtung achten.','Kettenschloss einsetzen, die Kurbel so drehen, dass das Schloss oben liegt, Hinterradbremse ziehen und kräftig aufs Pedal treten – das Schloss rastet ein.','Durch alle Gänge schalten und auf Geräusche achten.'],
+    tools:['schlosszange','kettennieter','kettenlehre','lappen','oel'],
+    note:'Viele Hersteller geben Kettenschlösser für 11/12-fach als nicht wiederverwendbar an. Ich bin nicht sicher, ob das für alle Marken gilt – prüf den Hinweis auf der Verpackung.'}
+  ],
+  shop:'Die Kette springt auch nach dem Wechsel weiter durch: Dann ist meist die Kassette verschlissen – oder das Schaltauge verbogen.'},
+
+ {id:'kassette',n:'Kassette',g:'Antrieb',a:[215,486],l:[105,440],z:[215,530],zw:300,
+  short:'Das Ritzelpaket am Hinterrad',
+  what:'Das Ritzelpaket am Hinterrad. Jedes Ritzel ist ein Gang: große Ritzel sind leicht (bergauf), kleine schwer (schnell).',
+  how:'Die Kassette steckt auf dem {{Freilauf}}körper der Hinterradnabe und wird mit einem Verschlussring gehalten. Gravelbikes mit {{1x und 2x}}-Antrieb haben oft Kassetten mit sehr großer Bandbreite, damit ein Kettenblatt vorne reicht.',
+  wear:['Zähne sehen spitz und hakenförmig aus („Haifischzähne")','Eine neue Kette springt auf häufig genutzten Ritzeln','Dreck- und Ölklumpen zwischen den Ritzeln'],
+  tasks:[
+   {t:'Kassette reinigen',lv:1,iv:'bei jeder gründlichen Antriebsreinigung',
+    steps:['Lappen in die Zwischenräume ziehen und hin- und herreiben (wie Zahnseide).','Hartnäckigen Dreck mit Bürste und Entfetter lösen.','Gründlich trocknen lassen, danach die Kette neu ölen.'],
+    tools:['lappen','reiniger','handschuhe']},
+   {t:'Kassette tauschen',lv:2,iv:'meist nach zwei bis drei Ketten – oder wenn eine neue Kette springt',
+    steps:['Hinterrad ausbauen.','Kettenpeitsche um ein mittleres Ritzel legen, Kassettenabzieher in den Verschlussring stecken.','Peitsche festhalten und den Abzieher mit einem Schlüssel gegen den Uhrzeigersinn lösen.','Freilaufkörper reinigen. Die neue Kassette hat eine breitere Nut – auf die passende Stelle am Freilauf ausrichten und aufschieben.','Verschlussring mit dem Drehmomentschlüssel auf den Herstellerwert anziehen (steht auf dem Ring oder in der Anleitung).'],
+    tools:['peitsche','abzieher','drehmo','lappen','reiniger'],
+    note:'Kassette und Freilauf müssen zum gleichen Standard passen. Im Zweifel die Bezeichnung von Nabe und alter Kassette mit in den Laden nehmen.'}
+  ],
+  shop:'Unklar, welcher Freilaufstandard verbaut ist, oder der Verschlussring sitzt extrem fest.'},
+
+ {id:'schaltwerk',n:'Schaltwerk',g:'Antrieb',a:[222,610],l:[150,782],z:[222,592],zw:300,
+  short:'Führt die Kette auf die Ritzel',
+  what:'Das Schaltwerk hinten bewegt die Kette von Ritzel zu Ritzel und hält sie dabei unter Spannung.',
+  how:'Ein Zug (oder bei elektronischen Gruppen ein Motor) zieht das Schaltwerk Richtung große Ritzel, eine Feder zieht es zurück. Die zwei {{Schaltröllchen}} führen und spannen die Kette. Gravel-Schaltwerke haben oft eine {{Kupplung}} gegen Kettenschlagen. Befestigt ist das Schaltwerk am {{Schaltauge}}. Eingestellt wird es über drei Dinge: {{Zugspannung}}, {{Anschlagschrauben}} und {{B-Schraube}}.',
+  wear:['Gänge springen, rattern oder kommen verzögert','Schaltwerk steht von hinten gesehen schräg (Hinweis auf verbogenes Schaltauge)','Schaltröllchen wackeln oder haben abgenutzte Zähne','Dreckkrusten auf den Röllchen'],
+  tasks:[
+   {t:'Schaltröllchen reinigen',lv:1,iv:'bei jeder Kettenpflege',
+    steps:['Kette langsam rückwärts kurbeln und einen Schraubendreher oder eine alte Zahnbürste an die Röllchen halten, um Dreckringe abzukratzen.','Mit Lappen nachwischen.'],
+    tools:['lappen','reiniger']},
+   {t:'Schaltung nachstellen (Zugspannung)',lv:2,iv:'wenn Gänge nicht sauber kommen – bei neuen Zügen nach einigen hundert Kilometern üblich',
+    steps:['Auf das kleinste Ritzel schalten und die Kurbel drehen (Rad angehoben).','Einmal hochschalten. Klettert die Kette zu zögerlich aufs nächstgrößere Ritzel: Einstellschraube eine halbe Umdrehung gegen den Uhrzeigersinn drehen – das erhöht die Zugspannung.','Kommt sie beim Zurückschalten aufs kleinere Ritzel zu spät oder rattert: im Uhrzeigersinn drehen.','In kleinen Schritten durch alle Gänge schalten, bis jeder Klick sauber sitzt. Zum Schluss Probefahrt unter Last.'],
+    tools:['inbus'],
+    note:'Schaltet es nur auf einzelnen Ritzeln schlecht und die Spannung lässt sich nicht für alle Gänge gleichzeitig treffen, ist oft das Schaltauge verbogen.'},
+   {t:'Anschlagschrauben einstellen',lv:2,iv:'nur wenn die Kette über das größte oder kleinste Ritzel hinausfällt',
+    steps:['Herausfinden, welche Schraube H (außen, kleinstes Ritzel) und welche L (innen, größtes Ritzel) ist – meist beschriftet.','Fällt die Kette außen herunter: H-Schraube eine Viertelumdrehung im Uhrzeigersinn. Kommt sie nicht aufs kleinste Ritzel: gegen den Uhrzeigersinn.','Fällt sie innen Richtung Speichen: L-Schraube im Uhrzeigersinn. Kommt sie nicht aufs größte Ritzel: gegen den Uhrzeigersinn.','Nach jeder Viertelumdrehung testen.'],
+    tools:['kreuz','inbus'],
+    note:'Eine Kette in den Speichen kann das Hinterrad blockieren – das ist gefährlich. Die L-Schraube daher besonders sorgfältig prüfen.'},
+   {t:'B-Schraube einstellen',lv:2,iv:'bei Problemen auf den großen Ritzeln oder nach Kassettenwechsel',
+    steps:['Aufs größte Ritzel schalten.','Abstand zwischen oberem Schaltröllchen und Ritzel prüfen. Den Sollwert bzw. die Einstelllehre gibt der Hersteller vor – Shimano und SRAM machen das unterschiedlich.','Mit der B-Schraube einstellen.'],
+    tools:['inbus','kreuz']},
+   {t:'Schaltzug tauschen',lv:3,iv:'wenn das Schalten trotz Einstellung zäh wird',
+    steps:['Bei innen verlegten Zügen ist das fummelig: Neuen Zug am alten entlang einführen oder Führungshilfen (Liner) nutzen.','Zughülle sauber ablängen, Endkappen aufsetzen.','Zug am Schaltwerk klemmen, Zugspannung einstellen, Endhülse aufcrimpen.'],
+    tools:['zugschneider','inbus'],
+    note:'Bei innen verlegten Zügen durch den Steuersatz ist das eher ein Werkstattjob.'}
+  ],
+  shop:'Schaltauge verbogen (Schaltwerk steht schräg), Schaltwerk nach Sturz beschädigt, oder Züge laufen innen durch den Steuersatz.'},
+
+ {id:'kurbel',n:'Kurbel & Kettenblatt',lab:'Kurbel',g:'Antrieb',a:[500,598],l:[470,782],z:[470,585],zw:320,
+  short:'Wandelt Trittkraft in Kettenzug um',
+  what:'Die Kurbelarme übertragen deine Beinkraft, das Kettenblatt treibt die Kette an.',
+  how:'Beide Kurbelarme sitzen auf einer gemeinsamen Achse, die durch das Tretlager läuft. Gravelbikes haben oft nur ein Kettenblatt ({{1x und 2x}}) mit {{Narrow-Wide}}-Zähnen, die die Kette ohne Umwerfer halten.',
+  wear:['Spitze, hakenförmige Zähne am Kettenblatt','Knacken bei jeder Kurbelumdrehung','Lockere Kettenblattschrauben','Spiel, wenn man den Kurbelarm seitlich rüttelt'],
+  tasks:[
+   {t:'Schrauben prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Kettenblattschrauben und Kurbelschrauben mit dem Drehmomentschlüssel auf den Herstellerwert prüfen.','Kurbelarm greifen und quer zur Fahrtrichtung rütteln. Spiel kann vom Kurbelsitz oder vom Tretlager kommen.'],
+    tools:['inbus','torx','drehmo']},
+   {t:'Kettenblatt tauschen',lv:2,iv:'meist nach mehreren Ketten',
+    steps:['Je nach System Kettenblatt direkt abschrauben oder vorher die Kurbel ausbauen.','Neues Kettenblatt in richtiger Ausrichtung montieren (Markierungen beachten).','Schrauben über Kreuz auf Drehmoment anziehen.'],
+    tools:['inbus','torx','drehmo','fett'],
+    note:'Der Kurbelausbau ist systemabhängig (z. B. Shimano Hollowtech II, SRAM DUB). Herstelleranleitung nutzen.'}
+  ],
+  shop:'Unklares Kurbelsystem, Knacken, das du nicht findest, oder Spiel, das nach dem Nachziehen bleibt.'},
+
+ {id:'tretlager',n:'Tretlager',g:'Antrieb',a:[450,568],l:[400,690],z:[450,568],zw:280,
+  short:'Lager für die Kurbelachse',
+  what:'Die Lager im Rahmen, in denen sich die Kurbelachse dreht.',
+  how:'Es gibt geschraubte Tretlager (Gewinde im Rahmen) und eingepresste ({{Pressfit}}). Sie sind abgedichtet, verschleißen aber durch Wasser und Dreck.',
+  wear:['Knacken bei jedem Tritt, besonders unter Last','Spiel beim seitlichen Rütteln der Kurbel','Raues oder knirschendes Gefühl, wenn man die Kurbel ohne Kette dreht'],
+  tasks:[
+   {t:'Tretlager prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Kurbelarm greifen und quer zum Rad rütteln: Spiel?','Kette vom Kettenblatt nehmen (nach innen ablegen) und die Kurbel drehen: läuft sie ruhig oder rau?','Knacken kann auch von Pedalen, Sattelstütze oder Steckachse kommen. Diese zuerst prüfen und fetten, bevor du das Tretlager verdächtigst.'],
+    tools:[]},
+   {t:'Tretlager tauschen',lv:3,iv:'bei Spiel oder rauem Lauf',
+    steps:['Kurbel ausbauen (systemabhängig).','Lager mit dem passenden Werkzeug herausschrauben oder auspressen.','Gewinde bzw. Sitz reinigen, neues Lager nach Herstelleranleitung montieren.'],
+    tools:['innenlager','drehmo','fett']}
+  ],
+  shop:'Fast immer bei Pressfit-Lagern und wenn dir das Spezialwerkzeug fehlt.'},
+
+ {id:'pedal',n:'Pedale',g:'Antrieb',a:[530,616],l:[610,690],z:[525,612],zw:280,
+  short:'Verbindung zwischen Fuß und Kurbel',
+  what:'Die Verbindung zwischen Fuß und Kurbel – entweder Plattformpedale oder Klickpedale (am Gravelbike oft SPD).',
+  how:'Das Pedal dreht sich auf einer Achse mit Lagern und ist in die Kurbel geschraubt. Wichtig: Das linke Pedal hat Linksgewinde, damit es sich beim Treten nicht losdreht. Bei Klickpedalen hält ein Federmechanismus die Schuhplatte (Cleat); die Auslösehärte ist einstellbar.',
+  wear:['Spiel in der Pedalachse','Raues Drehen oder Knacken','Abgenutzte Cleats: Ausklicken wird unzuverlässig oder zu leicht'],
+  tasks:[
+   {t:'Pedale ab- und anbauen',lv:1,iv:'bei Pedalwechsel und einmal im Jahr zum Fetten',
+    steps:['Rechtes Pedal hat Rechtsgewinde, linkes Pedal Linksgewinde.','Merkhilfe: Schlüssel oben an der Pedalachse ansetzen und zum Lösen immer Richtung Hinterrad drücken – das gilt für beide Seiten.','Gewinde reinigen und leicht fetten.','Zum Montieren die ersten Umdrehungen von Hand eindrehen (Pedale sind mit L und R markiert), dann fest anziehen.'],
+    tools:['pedalschl','inbus','fett']},
+   {t:'Auslösehärte und Cleats',lv:1,iv:'bei Bedarf und bei jeder Inspektion',
+    steps:['Auslösehärte über die kleine Schraube am Pedal einstellen – zu Beginn eher leicht.','Cleats auf Abnutzung prüfen und die Schrauben nachziehen.'],
+    tools:['inbus']}
+  ],
+  shop:'Lagerspiel im Pedal. Viele günstige Pedale lassen sich kaum sinnvoll warten – dann eher tauschen.'},
+
+ /* -------- BREMSEN -------- */
+ {id:'bremse',n:'Scheibenbremse',lab:'Bremse',g:'Bremsen',a:[748,494],l:[655,620],z:[768,505],zw:300,
+  short:'Bremssattel, Beläge und Bremsscheibe',
+  what:'Bremst das Rad, indem Beläge auf eine Scheibe an der Nabe drücken. Funktioniert bei Nässe deutlich zuverlässiger als Felgenbremsen.',
+  how:'Hydraulisch: Der Hebel drückt Flüssigkeit durch die Leitung, Kolben im Bremssattel pressen die Beläge an die Scheibe. Die Kolben stellen sich bei Belagverschleiß selbst nach. Mechanische Scheibenbremsen arbeiten mit einem Zug und müssen von Hand nachgestellt werden. Beläge und Scheibe dürfen nie mit Öl oder Fett in Berührung kommen.',
+  wear:['Quietschen oder Kreischen (oft Verschmutzung)','Nachlassende Bremskraft oder schleifende Geräusche','Wenig Restbelag','Scheibe verbogen, verfärbt oder unter der Mindestdicke'],
+  tasks:[
+   {t:'Beläge prüfen',lv:1,iv:'etwa monatlich und bei jeder Inspektion',
+    steps:['Mit einer Taschenlampe von oben in den Bremssattel schauen, oder Laufrad ausbauen und die Beläge herausnehmen.','Die Verschleißgrenze nennt der Hersteller. Shimano gibt meines Wissens 0,5 mm Restbelag an – prüf die Anleitung deiner Bremse.','Belag glasig, verölt oder ungleichmäßig abgenutzt? Tauschen.'],
+    tools:['messschieber','inbus']},
+   {t:'Bremsscheibe prüfen und reinigen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Die Mindestdicke ist oft auf der Scheibe eingraviert (z. B. „MIN TH"). Mit dem Messschieber nachmessen.','Rad drehen und in den Spalt schauen: Schlägt die Scheibe an einer Stelle seitlich, ist sie verbogen.','Mit sauberem Tuch und Isopropanol oder Bremsenreiniger abwischen.'],
+    tools:['messschieber','iso','handschuhe','lappen'],
+    note:'Nicht mit den Fingern auf die Bremsfläche fassen – Hautfett reicht schon für Quietschen.'},
+   {t:'Bremssattel ausrichten (bei Schleifen)',lv:2,iv:'wenn die Scheibe schleift',
+    steps:['Die beiden Befestigungsschrauben des Sattels leicht lösen, sodass er sich bewegen lässt.','Bremshebel ziehen und gezogen halten – der Sattel richtet sich zur Scheibe aus.','Bei gezogenem Hebel die Schrauben abwechselnd festziehen, mit dem Drehmomentschlüssel auf den Wert aus der Anleitung.','Rad drehen und horchen. Schleift es noch leicht, gegen einen hellen Hintergrund in den Spalt schauen und von Hand feinjustieren.'],
+    tools:['inbus','drehmo']},
+   {t:'Beläge wechseln',lv:2,iv:'wenn die Verschleißgrenze erreicht ist',
+    steps:['Laufrad ausbauen.','Sicherungssplint oder -schraube entfernen und die Beläge samt Spreizfeder herausziehen.','Kolben gerade zurückdrücken – mit Kolbenrücksteller oder Kunststoff-Reifenheber, niemals mit Metall.','Neue, zur Bremse passende Beläge (Typ steht in der Anleitung) mit Feder einsetzen und sichern.','Rad einbauen und den Hebel mehrfach ziehen, bis der {{Druckpunkt}} wieder da ist.','Beläge {{Einbremsen}}.'],
+    tools:['inbus','kolben','handschuhe','iso'],
+    note:'Ein verölter Belag lässt sich meist nicht retten – tauschen statt reinigen.'},
+   {t:'Bremse entlüften',lv:3,iv:'bei schwammigem Druckpunkt, sonst nach Herstellerintervall',
+    steps:['Nur mit dem Kit und Medium des Herstellers ({{Mineralöl und DOT}}).','Ablauf genau nach Herstelleranleitung – sie unterscheidet sich je nach Bremse.'],
+    tools:['entlueft','handschuhe','iso']}
+  ],
+  shop:'Der Hebel lässt sich bis zum Lenker ziehen, der Druckpunkt bleibt schwammig, irgendwo tritt Flüssigkeit aus – oder du bist unsicher. Bremsen sind sicherheitskritisch.'},
+
+ {id:'hebel',n:'Schalt-/Bremshebel',g:'Bremsen',a:[786,216],l:[830,62],z:[780,245],zw:300,
+  short:'Ein Hebel für Bremse und Schaltung',
+  what:'Ein kombinierter Hebel für Bremse und Schaltung. Hydraulische Versionen enthalten den Geberkolben der Bremse.',
+  how:'Den ganzen Hebel ziehen = bremsen. Geschaltet wird je nach Hersteller unterschiedlich: Bei Shimano schwenkt man den Bremshebel nach innen für ein größeres Ritzel und drückt den kleinen Hebel dahinter für ein kleineres. Bei SRAM gibt es einen Schalthebel mit kurzem und langem Druck, bei elektronischen Gruppen Taster. Die Züge und Leitungen laufen unter dem Lenkerband zum Rahmen.',
+  wear:['Bremshebel lässt sich zu weit ziehen oder der {{Druckpunkt}} wandert','Schalten wird zäh oder ungenau','Griffgummis eingerissen oder rutschig','Hebel sitzt locker oder ist verdreht'],
+  tasks:[
+   {t:'Druckpunkt prüfen',lv:1,iv:'vor jeder Fahrt kurz',
+    steps:['Beide Hebel kräftig ziehen: Der Druckpunkt muss fest sein und deutlich vor dem Lenker liegen.','Mehrmals pumpen: Wandert der Druckpunkt näher an den Lenker, ist vermutlich Luft im System.'],
+    tools:[],
+    note:'Wurde das Rad kopfüber gelagert oder transportiert, vor der Fahrt mehrfach die Hebel ziehen und den Druckpunkt prüfen.'},
+   {t:'Griffweite und Position einstellen',lv:1,iv:'nach Bedarf',
+    steps:['Viele Hebel haben eine kleine Schraube für die Griffweite – hilfreich bei kleineren Händen.','Position: Lenkerband lösen, Hebelschelle (Schraube unter dem Griffgummi) lockern, Hebel verschieben, festziehen. Beide Seiten auf gleiche Höhe bringen.'],
+    tools:['inbus','drehmo']}
+  ],
+  shop:'Defekt in der Hebelmechanik, Ölverlust am Hebel, Entlüften.'},
+
+ /* -------- LAUFRÄDER -------- */
+ {id:'reifen',n:'Reifen',g:'Laufräder',a:[933,426],l:[935,378],z:[785,530],zw:520,
+  short:'Grip, Komfort und Pannenschutz',
+  what:'Der einzige Kontakt zum Boden. Bestimmt Grip, Komfort, Rollwiderstand und Pannenschutz. Gravelreifen sind meist etwa 35 bis 50 mm breit.',
+  how:'Der Reifen sitzt mit seinem Wulst im Felgenhorn. Innen hält ein Schlauch die Luft (oder Dichtmilch bei {{Tubeless}}). Der Luftdruck entscheidet über Komfort, Rollwiderstand und darüber, wie leicht der Schlauch an Kanten eingeklemmt wird.',
+  wear:['Abgefahrenes Profil oder flach gefahrene Mitte','Risse oder poröse Stellen an der Flanke','Schnitte, eingetretene Splitter oder Dornen','Wiederholte „Snakebites" (zwei kleine Schlitze im Schlauch) – meist zu wenig Druck'],
+  tasks:[
+   {t:'Luftdruck prüfen',lv:1,iv:'vor jeder Fahrt kurz, mindestens wöchentlich messen',
+    steps:['Ventilkappe abnehmen. Bei Presta-Ventil die kleine Rändelmutter aufdrehen und einmal kurz antippen.','Pumpe aufsetzen und auf den Zieldruck pumpen.','Den zulässigen Bereich findest du auf der Reifenflanke – und bei manchen Felgen einen eigenen Maximaldruck. Der niedrigere Höchstwert gilt.'],
+    tools:['pumpe'],
+    note:'Faustwert, kein fester Wert: Viele fahren Gravelreifen um 40 mm mit Schlauch grob zwischen 2,5 und 3,5 bar – mehr bei höherem Gewicht und auf Asphalt, weniger im Gelände. Taste dich heran.'},
+   {t:'Reifen kontrollieren',lv:1,iv:'nach Touren auf Schotter',
+    steps:['Rad langsam drehen und die Lauffläche ansehen.','Steckende Splitter oder Steinchen vorsichtig herauspulen.','Flanken auf Risse und Beulen prüfen. Eine Beule heißt: Reifen tauschen.'],
+    tools:[]},
+   {t:'Schlauch wechseln oder flicken',lv:2,iv:'bei einer Panne',
+    steps:['Rad ausbauen: {{Steckachse}} herausdrehen bzw. {{Schnellspanner}} öffnen. Hinten vorher aufs kleinste Ritzel schalten.','Restluft ablassen und den Reifenwulst rundherum in die Felgenmitte drücken – das schafft Spiel.','Gegenüber dem Ventil mit zwei Reifenhebern eine Reifenseite über die Felge hebeln.','Schlauch herausziehen. Loch suchen (aufpumpen, hören, fühlen) und vor allem die Ursache finden: Reifen innen vorsichtig abtasten.','Neuen oder geflickten Schlauch leicht aufpumpen, damit er Form hat, und am Ventil beginnend einlegen.','Reifen möglichst von Hand aufziehen und am Ventil enden. So wird der Schlauch nicht eingeklemmt.','Langsam aufpumpen und prüfen, dass die Linie an der Reifenflanke rundum gleich weit von der Felge entfernt ist. Dann auf vollen Druck.'],
+    tools:['heber','pumpe','schlauch','inbus']}
+  ],
+  shop:'Für Reifen selten nötig – höchstens wenn du auf {{Tubeless}} umsteigen willst und dir Felgenband und Ventile fehlen.'},
+
+ {id:'laufrad',n:'Laufrad & Nabe',lab:'Laufrad',g:'Laufräder',a:[785,530],l:[790,782],z:[785,530],zw:480,
+  short:'Felge, Speichen, Nabe und Steckachse',
+  what:'Trägt den Reifen, hält die Bremsscheibe und überträgt hinten den Antrieb. Besteht aus Felge, Speichen und Nabe.',
+  how:'Die Speichen stehen unter Zug und halten die Felge rund. In der Nabe laufen Kugellager um die Achse. Hinten sitzt in der Nabe der {{Freilauf}}. Am Rahmen und an der Gabel wird das Laufrad meist mit einer {{Steckachse}} befestigt.',
+  wear:['Felge schlägt seitlich oder in der Höhe','Lockere oder gebrochene Speichen (klingen beim Anzupfen anders)','Spiel oder raues Laufen der Nabe','Freilauf greift nicht oder knackt'],
+  tasks:[
+   {t:'Steckachsen prüfen',lv:1,iv:'vor jeder Fahrt, besonders nach einem Radausbau',
+    steps:['Sitzt die Achse fest? Mit der Hand prüfen.','Bei Hebelachsen: Der Hebel muss am Ende spürbar Widerstand haben.','Gelegentlich ausbauen, Gewinde säubern und dünn fetten (sofern der Hersteller nichts anderes sagt). Mit dem Drehmoment anziehen, das auf der Achse steht.'],
+    tools:['inbus','drehmo','fett']},
+   {t:'Rundlauf und Speichen prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Rad anheben und drehen. An einem festen Punkt (Bremssattel, Rahmen) beobachten, ob die Felge seitlich oder in der Höhe schlägt.','Jeweils zwei benachbarte Speichen mit einer Hand zusammendrücken. Alle sollten sich ähnlich straff anfühlen.'],
+    tools:[]},
+   {t:'Nabenlager prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Rad eingebaut lassen, Felge oben greifen und seitlich hin- und herdrücken: Klacken bedeutet Lagerspiel.','Rad drehen und horchen: Es sollte lange und leise auslaufen, ohne Rauheit.'],
+    tools:[]},
+   {t:'Kleine Seitenschläge zentrieren',lv:3,iv:'bei Bedarf',
+    steps:['Stelle mit dem Schlag markieren.','Speichennippel in Viertelumdrehungen anziehen oder lösen: Speichen zur einen Nabenseite ziehen die Felge zu dieser Seite.','Immer nur wenig verändern und sofort prüfen.'],
+    tools:['speichen','zentrier'],
+    note:'Wer sich unsicher ist, macht es eher schlimmer. Für den Anfang lieber der Werkstatt zuschauen.'}
+  ],
+  shop:'Gebrochene Speiche, deutlicher Schlag, Lagerspiel oder Freilaufprobleme.'},
+
+ /* -------- COCKPIT & LENKUNG -------- */
+ {id:'lenker',n:'Lenker',g:'Cockpit & Lenkung',a:[792,276],l:[925,300],z:[752,255],zw:320,
+  short:'Rennlenker mit Lenkerband',
+  what:'Der Rennlenker („Dropbar") bietet mehrere Griffpositionen: oben, auf den Griffgummis der Hebel und unten. Gravellenker sind unten oft nach außen ausgestellt.',
+  how:'Die Schalt-/Bremshebel sind mit Schellen am Lenker befestigt, darüber wird das Lenkerband gewickelt. Züge und Leitungen laufen meist unter dem Band. In den Lenkerenden stecken Endstopfen.',
+  wear:['Lenkerband rissig, rutschig oder durchgescheuert','Lenker verdreht sich bei Belastung','Kerben, Risse oder Druckstellen an der Klemmung','Fehlende Endstopfen (Verletzungsgefahr bei Sturz)'],
+  tasks:[
+   {t:'Sitz und Zustand prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Vorderrad zwischen die Knie klemmen und versuchen, den Lenker zu verdrehen. Er darf sich mit normaler Kraft nicht bewegen.','Lenkerband und Endstopfen ansehen.'],
+    tools:[]},
+   {t:'Lenkerband tauschen',lv:2,iv:'wenn es abgenutzt ist',
+    steps:['Endstopfen herausziehen, Griffgummis nach vorn umklappen und das alte Band abwickeln.','Neues Band am Lenkerende beginnen und mit leichter Spannung nach oben wickeln, dabei gleichmäßig überlappen.','Um die Hebelschelle herum mit dem beiliegenden Kurzstück oder in einer Achterschlaufe wickeln.','Am Oberlenker schräg abschneiden und mit Abschlussband fixieren. Endstopfen wieder einsetzen.'],
+    tools:['klebeband'],
+    note:'Wickelrichtung und Überlappung empfehlen Hersteller unterschiedlich – die Anleitung des Lenkerbands ist der beste Anhaltspunkt.'}
+  ],
+  shop:'Risse oder Kerben am Lenker, Lenker nach Sturz – im Zweifel tauschen.'},
+
+ {id:'vorbau',n:'Vorbau',g:'Cockpit & Lenkung',a:[690,219],l:[640,135],z:[680,228],zw:300,
+  short:'Verbindet Lenker und Gabel',
+  what:'Verbindet den Gabelschaft mit dem Lenker. Seine Länge und Höhe bestimmen, wie gestreckt du sitzt.',
+  how:'Der Vorbau klemmt seitlich auf den Gabelschaft und vorn mit einer Klemmplatte den Lenker. Mit {{Spacer}}n darunter oder darüber wird die Höhe eingestellt.',
+  wear:['Lenker verdreht sich oder knarzt','Risse an der Klemmung','Ungleich breite Spalte an der Lenkerklemmung'],
+  tasks:[
+   {t:'Schrauben prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Alle Klemmschrauben mit dem Drehmomentschlüssel auf den Wert prüfen, der auf dem Vorbau steht.','Frontklemmung: Schrauben über Kreuz in kleinen Schritten anziehen. Wenn der Hersteller nichts anderes vorgibt, sollten die Spalte oben und unten etwa gleich breit sein.'],
+    tools:['inbus','drehmo','carbon']},
+   {t:'Lenkerhöhe ändern',lv:2,iv:'nach Bedarf',
+    steps:['Seitliche Klemmschrauben des Vorbaus lösen, dann die Schraube in der Kappe oben.','Kappe und Vorbau abnehmen, Spacer umsetzen.','Vorbau und Kappe wieder aufsetzen und dann das Lagerspiel einstellen wie beim Steuersatz beschrieben.','Vorbau gerade zum Vorderrad ausrichten und die Klemmschrauben auf Drehmoment anziehen.'],
+    tools:['inbus','drehmo'],
+    note:'Gabelschaft und Vorbau müssen sich weiterhin ausreichend überlappen – Herstellerangabe beachten.'}
+  ],
+  shop:'Gabelschaft kürzen – vor allem bei Carbon.'},
+
+ {id:'steuersatz',n:'Steuersatz',g:'Cockpit & Lenkung',a:[676,285],l:[555,200],z:[676,282],zw:300,
+  short:'Lager, in denen Gabel und Lenker drehen',
+  what:'Die Lager, in denen sich Gabel und Lenker im Rahmen drehen.',
+  how:'Zwei Kugellager, oben und unten im Steuerrohr. Beim heute üblichen {{Ahead-Steuersatz}} wird das Lagerspiel über die Kappe oben eingestellt, festgeklemmt wird alles durch die Schrauben des Vorbaus.',
+  wear:['Klacken oder Rucken beim Bremsen','Lenkung rastet in Geradeausstellung ein','Raues oder schwergängiges Lenken'],
+  tasks:[
+   {t:'Spiel prüfen',lv:1,iv:'etwa monatlich und bei jeder Inspektion',
+    steps:['Vorderradbremse ziehen und festhalten.','Andere Hand um den Übergang zwischen Rahmen und Gabel unten am Steuerrohr legen.','Rad vor und zurück schieben: Fühlbares Klacken heißt, es ist Spiel da.','Vorderrad anheben und den Lenker langsam drehen: Er sollte gleichmäßig laufen, ohne einzurasten.'],
+    tools:[]},
+   {t:'Spiel einstellen',lv:2,iv:'wenn Spiel spürbar ist',
+    steps:['Seitliche Klemmschrauben des Vorbaus lösen.','Schraube in der Kappe oben in Vierteldrehungen anziehen, bis das Spiel weg ist. Die Lenkung darf dabei nicht schwergängig werden.','Vorbau gerade zum Vorderrad ausrichten.','Klemmschrauben des Vorbaus abwechselnd auf Drehmoment anziehen.','Spiel erneut prüfen.'],
+    tools:['inbus','drehmo']},
+   {t:'Lager reinigen oder tauschen',lv:3,iv:'bei rauem Lauf oder Einrasten',
+    steps:['Vorbau und Gabel ausbauen.','Lager reinigen und fetten oder tauschen. Passende Lagermaße finden.','Zusammenbauen und Spiel einstellen.'],
+    tools:['inbus','drehmo','fett','lappen'],
+    note:'Bei Zügen, die durch den Steuersatz laufen (bei neueren Gravelbikes häufig), wird das sehr aufwendig.'}
+  ],
+  shop:'Lagertausch, rastende Lenkung, oder Züge laufen durch den Steuersatz.'},
+
+ {id:'gabel',n:'Gabel',g:'Cockpit & Lenkung',a:[743,440],l:[880,465],z:[735,425],zw:400,
+  short:'Hält das Vorderrad',
+  what:'Hält das Vorderrad und überträgt deine Lenkbewegungen. Gravelgabeln sind meist starr, also ungefedert.',
+  how:'Der Gabelschaft läuft durch das Steuerrohr und wird über den Vorbau mit dem Lenker verbunden. Unten wird das Rad mit einer {{Steckachse}} befestigt. Viele Gravelgabeln haben Gewinde für Taschenhalter.',
+  wear:['Risse am Gabelkopf oder an den Ausfallenden','Verbogene Holme nach einem Sturz','Abgesplitterte Stellen mit sichtbaren Fasern (Carbon)'],
+  tasks:[
+   {t:'Sichtprüfung',lv:1,iv:'bei jeder Inspektion und nach jedem Sturz',
+    steps:['Gabel sauber machen und Holm für Holm ansehen, besonders unten an den Ausfallenden und oben am Gabelkopf.','Schrauben von Taschenhaltern auf festen Sitz prüfen.'],
+    tools:['lappen','inbus']}
+  ],
+  shop:'Jeder Schaden nach einem Frontalaufprall, Risse, Carbonschäden – und Service, falls deine Gabel doch gefedert ist.'},
+
+ /* -------- RAHMEN & SITZ -------- */
+ {id:'rahmen',n:'Rahmen',g:'Rahmen & Sitz',a:[600,405],l:[520,422],z:[500,430],zw:760,
+  short:'Das tragende Grundgerüst',
+  what:'Das Grundgerüst, das alle Teile verbindet und dein Gewicht trägt. Bei Gravelbikes meist aus Aluminium, Carbon oder Stahl.',
+  how:'Die Rohre bilden zwei Dreiecke, das Hauptdreieck und den Hinterbau. Diese Form ist steif und trotzdem leicht. Am Rahmen sitzen Gewinde für Flaschenhalter und Taschen, das austauschbare {{Schaltauge}} und oft innen verlegte Züge.',
+  wear:['Risse, vor allem an Schweißnähten, am Steuerrohr und am Tretlager','Tiefe Dellen (Alu) oder abgesplitterte Stellen mit Fasern (Carbon)','Knacken unter Last, das sich keinem Bauteil zuordnen lässt'],
+  tasks:[
+   {t:'Reinigen und Sichtprüfung',lv:1,iv:'alle paar Wochen und nach Schlammfahrten',
+    steps:['Mit Wasser und Fahrradreiniger abwaschen. Keinen Hochdruckreiniger direkt auf Lager richten.','Beim Trocknen Rohr für Rohr ansehen, besonders an den Übergängen.','Stellen, an denen Taschen oder Züge scheuern, mit Schutzfolie abkleben.'],
+    tools:['reiniger','lappen']},
+   {t:'Schaltauge kontrollieren',lv:1,iv:'nach jedem Umfallen auf die rechte Seite',
+    steps:['Von hinten auf das Schaltwerk schauen.','Die Schaltröllchen sollten senkrecht unter dem Ritzel stehen. Steht das Schaltwerk schräg, ist das Schaltauge vermutlich verbogen.'],
+    tools:[]}
+  ],
+  shop:'Risse, Verdacht auf Schaden nach einem Sturz (vor allem bei Carbon) und ein verbogenes Schaltauge, das gerichtet oder getauscht werden muss.'},
+
+ {id:'sattel',n:'Sattel',g:'Rahmen & Sitz',a:[320,206],l:[150,150],z:[345,215],zw:320,
+  short:'Trägt dein Gewicht',
+  what:'Trägt einen großen Teil deines Gewichts. Die richtige Position ist wichtig für Komfort und Kraftübertragung.',
+  how:'Das Sattelgestell (zwei Streben) sitzt in der Klemmung der Sattelstütze. Dort stellt man Neigung und Position vor/zurück ein, die Höhe über die Stütze.',
+  wear:['Bezug eingerissen','Gestell verbogen','Knarzen aus der Klemmung'],
+  tasks:[
+   {t:'Position einstellen',lv:1,iv:'nach Bedarf',
+    steps:['Aktuelle Position vorher markieren oder fotografieren.','Klemmschraube(n) unter dem Sattel lösen und Neigung oder Versatz in kleinen Schritten ändern.','Mit dem Drehmomentschlüssel auf den Wert an der Stütze anziehen.','Probefahrt. Pro Fahrt nur eine Sache ändern, sonst weißt du nicht, was gewirkt hat.'],
+    tools:['inbus','drehmo','klebeband']}
+  ],
+  shop:'Dauerhafte Sitzbeschwerden – dann eher ein Bikefitting als Schrauberei.'},
+
+ {id:'stuetze',n:'Sattelstütze',g:'Rahmen & Sitz',a:[360,262],l:[150,248],z:[360,255],zw:300,
+  short:'Hält den Sattel, bestimmt die Sitzhöhe',
+  what:'Hält den Sattel und bestimmt die Sitzhöhe.',
+  how:'Die Stütze steckt im Sitzrohr und wird von der Sattelklemme gehalten. Auf ihr ist eine Markierung für die Mindesteinstecktiefe – weiter darf sie nicht herausgezogen werden.',
+  wear:['Stütze rutscht langsam ein','Knarzen beim Sitzen','Markierung der Mindesteinstecktiefe ist sichtbar'],
+  tasks:[
+   {t:'Ausbauen, reinigen, fetten',lv:1,iv:'etwa zweimal im Jahr und bei Knarzen',
+    steps:['Höhe mit Klebeband an der Stütze markieren.','Sattelklemme lösen und die Stütze herausziehen.','Stütze und Sitzrohr innen sauber wischen.','Bei Alu oder Stahl dünn Montagefett auftragen. Ist Rahmen oder Stütze aus Carbon, Carbon-Montagepaste statt Fett nehmen.','Wieder einsetzen, Markierung beachten und mit dem Drehmomentschlüssel festziehen.'],
+    tools:['inbus','drehmo','fett','carbon','klebeband','lappen']}
+  ],
+  shop:'Stütze sitzt fest und lässt sich nicht herausziehen – nicht mit Gewalt arbeiten.'}
+];
+
+const INSP = [
+ {t:'Vorbereitung',parts:['rahmen'],tools:['reiniger','lappen','staender','handschuhe'],
+  checks:['Rad gereinigt – Schäden sieht man nur an einem sauberen Rad','Gutes Licht und Platz','Rad im Montageständer oder sicher angelehnt','Werkzeug bereitgelegt']},
+ {t:'Rahmen und Gabel',parts:['rahmen','gabel'],tools:[],
+  checks:['Keine Risse, Dellen oder Faserschäden','Ausfallenden unbeschädigt','Schaltwerk steht von hinten gesehen senkrecht (Schaltauge gerade)','Flaschen- und Taschenhalter fest']},
+ {t:'Steuersatz',parts:['steuersatz'],tools:['inbus','drehmo'],
+  checks:['Kein Spiel bei gezogener Vorderradbremse','Lenkung dreht frei und rastet nicht ein','Vorbau steht gerade zum Vorderrad']},
+ {t:'Lenker, Vorbau und Hebel',parts:['lenker','vorbau','hebel'],tools:['inbus','drehmo'],
+  checks:['Lenker lässt sich nicht gegen das Vorderrad verdrehen','Hebel sitzen fest und auf gleicher Höhe','Lenkerband und Endstopfen in Ordnung','Züge und Leitungen ohne Knicke oder Scheuerstellen']},
+ {t:'Sattel und Sattelstütze',parts:['sattel','stuetze'],tools:['inbus','drehmo','klebeband'],
+  checks:['Sattel sitzt fest und gerade','Stütze rutscht nicht ein, Mindesteinstecktiefe eingehalten','Sitzhöhe markiert']},
+ {t:'Laufräder',parts:['laufrad'],tools:['inbus','drehmo'],
+  checks:['Steckachsen fest','Kein sichtbarer Seiten- oder Höhenschlag','Speichen gleichmäßig straff','Kein Nabenspiel, Räder laufen leise aus','Freilauf greift zuverlässig']},
+ {t:'Reifen',parts:['reifen'],tools:['pumpe'],
+  checks:['Profil ausreichend, keine Risse oder Beulen','Fremdkörper entfernt','Ventil sitzt gerade','Luftdruck eingestellt']},
+ {t:'Bremsen',parts:['bremse','hebel'],tools:['messschieber','iso','inbus','drehmo'],
+  checks:['Belagdicke über der Verschleißgrenze','Scheiben über Mindestdicke, gerade und sauber','Bremssättel fest und ohne Schleifen','Druckpunkt fest und gleichbleibend','Keine Flüssigkeitsspuren an Hebeln, Leitungen und Sätteln']},
+ {t:'Kette',parts:['kette'],tools:['kettenlehre'],
+  checks:['Verschleiß gemessen und unter der Grenze','Keine steifen Glieder','Kettenschloss sitzt richtig']},
+ {t:'Kassette und Kettenblatt',parts:['kassette','kurbel'],tools:['inbus','torx','drehmo'],
+  checks:['Keine Haifischzähne','Kassette sitzt fest auf dem Freilauf','Kettenblattschrauben fest']},
+ {t:'Schaltung',parts:['schaltwerk'],tools:['inbus','kreuz'],
+  checks:['Alle Gänge schalten sauber in beide Richtungen','Kette fällt weder über das größte noch über das kleinste Ritzel','Schaltröllchen sauber und ohne Spiel']},
+ {t:'Kurbel, Tretlager und Pedale',parts:['kurbel','tretlager','pedal'],tools:['inbus','pedalschl'],
+  checks:['Kein Spiel an der Kurbel','Tretlager läuft ruhig','Pedale fest, ohne Spiel','Cleats in Ordnung']},
+ {t:'Schrauben auf Drehmoment',parts:['vorbau','lenker','stuetze','bremse','laufrad','kurbel'],tools:['drehmo','inbus','torx'],
+  checks:['Vorbau und Lenkerklemmung','Sattelklemme und Sattelstütze','Bremssättel und Bremsscheiben','Steckachsen','Kurbel und Kettenblatt','Flaschen- und Taschenhalter'],
+  note:'Die Werte stehen meist auf dem Bauteil oder in der Herstelleranleitung. Ich nenne hier bewusst keine Zahlen, weil sie je nach Bauteil stark abweichen.'},
+ {t:'Reinigen und schmieren',parts:['kette','kassette','schaltwerk','bremse'],tools:['reiniger','lappen','oel','iso'],
+  checks:['Antrieb gereinigt','Kette geölt und außen abgewischt','Bremsscheiben mit Isopropanol gereinigt','Rahmen trocken']},
+ {t:'Probefahrt',parts:['bremse','schaltwerk'],tools:[],
+  checks:['Bremsen erst langsam, dann kräftig getestet','Alle Gänge unter Last geschaltet','Keine ungewohnten Geräusche','Lenkung frei und gerade']}
+];
+
+/* ======================= STATE ======================= */
+const store={
+  get(k,d){try{const v=localStorage.getItem('fw:'+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('fw:'+k,JSON.stringify(v))}catch(e){}}
+};
+let owned=new Set(store.get('owned',[]));
+let checks=store.get('checks',{});
+let dtab=0;
+const openSteps=new Set();
+const BASE=[0,0,1000,810];
+let vb=BASE.slice();
+let current=null;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const byId=Object.fromEntries(PARTS.map(p=>[p.id,p]));
+const $=s=>document.querySelector(s);
+const svg=$('#bike'), stage=$('#stage'), panel=$('#panel');
+const NS='http://www.w3.org/2000/svg';
+
+/* ======================= HELPERS ======================= */
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmt=s=>esc(s).replace(/\{\{([^}]+)\}\}/g,(m,t)=>{
+  const key=Object.keys(GLOSS).find(k=>t.startsWith(k))||t;
+  return `<button class="term" data-term="${esc(key)}">${t}</button>`;
+});
+const plain=s=>s.replace(/\{\{([^}]+)\}\}/g,'$1');
+const LVN=['','Leicht','Mittel','Anspruchsvoll'];
+const lv=n=>`<span class="lv lv${n}"><span><i></i><i></i><i></i></span>${LVN[n]}</span>`;
+const chip=id=>`<button class="chip${owned.has(id)?' have':''}" data-tool="${id}">${esc(TOOLS[id].n)}</button>`;
+const toolsOf=p=>[...new Set(p.tasks.flatMap(t=>t.tools))];
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),1800)}
+function openSheet(html){const s=$('#sheet');s.innerHTML=html;s.hidden=false;$('#scrim').hidden=false;const f=s.querySelector('button,textarea');if(f)f.focus()}
+function closeSheet(){$('#sheet').hidden=true;$('#scrim').hidden=true}
+
+let dl=null;
+async function initDownloads(){try{if(window.claude&&window.claude.use){dl=await window.claude.use('downloads')}}catch(e){dl=null}}
+async function copyMd(text,filename){
+  try{await navigator.clipboard.writeText(text);toast('Markdown kopiert');return}catch(e){}
+  openSheet(`<h3>Markdown</h3><p>Kopieren hat nicht automatisch geklappt. Text markieren und kopieren:</p><textarea readonly>${esc(text)}</textarea>
+  <div class="btnrow">${dl?`<button class="btn" data-act="dlmd" data-fn="${esc(filename)}">Als Datei speichern</button>`:''}<button class="btn ghost" data-act="close">Schließen</button></div>`);
+  const ta=$('#sheet textarea');ta.focus();ta.select();
+  copyMd.last=text;
+}
+
+/* ======================= SVG ======================= */
+function spokes(cx,cy,g){
+  for(let i=0;i<24;i++){
+    const a=i*Math.PI/12, off=(i%2?1:-1)*0.42;
+    const l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',cx+16*Math.cos(a+off));l.setAttribute('y1',cy+16*Math.sin(a+off));
+    l.setAttribute('x2',cx+160*Math.cos(a));l.setAttribute('y2',cy+160*Math.sin(a));
+    l.setAttribute('class','spk');g.appendChild(l);
+  }
+}
+spokes(215,530,$('#spokesR'));spokes(785,530,$('#spokesF'));
+
+const L=$('#labels');
+PARTS.forEach(p=>{
+  const line=document.createElementNS(NS,'line');
+  line.setAttribute('class','lead');line.dataset.for=p.id;line.setAttribute('x1',p.l[0]);line.setAttribute('y1',p.l[1]);
+  line.setAttribute('x2',p.a[0]);line.setAttribute('y2',p.a[1]);L.appendChild(line);
+  const dot=document.createElementNS(NS,'circle');
+  dot.setAttribute('class','dot');dot.setAttribute('cx',p.a[0]);dot.setAttribute('cy',p.a[1]);dot.setAttribute('r',9);
+  dot.dataset.part=p.id;dot.id='d-'+p.id;L.appendChild(dot);
+  const g=document.createElementNS(NS,'g');g.setAttribute('class','lbl');g.dataset.part=p.id;g.id='l-'+p.id;
+  g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',p.n);
+  const r=document.createElementNS(NS,'rect');r.setAttribute('rx',22);
+  const t=document.createElementNS(NS,'text');t.setAttribute('x',p.l[0]);t.setAttribute('y',p.l[1]);
+  t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','central');t.textContent=p.lab||p.n;
+  g.appendChild(r);g.appendChild(t);L.appendChild(g);
+});
+function sizeLabels(){
+  L.querySelectorAll('.lbl').forEach(g=>{
+    const t=g.querySelector('text'),r=g.querySelector('rect');let b;
+    try{b=t.getBBox()}catch(e){return}
+    if(!b.width)return;
+    const p=byId[g.dataset.part];
+    const x0=p.l[0]-b.width/2;let sh=0;
+    if(x0-16<4)sh=4-(x0-16); if(x0+b.width+16>996)sh=996-(x0+b.width+16);t.setAttribute('x',p.l[0]+sh);
+    const ln=L.querySelector('line[data-for="'+p.id+'"]');if(ln)ln.setAttribute('x1',p.l[0]+sh);
+    b=t.getBBox();
+    r.setAttribute('x',b.x-16);r.setAttribute('y',b.y-6);r.setAttribute('width',b.width+32);r.setAttribute('height',b.height+12);
+  });
+}
+sizeLabels();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(sizeLabels);
+
+function setVB(a){vb=a;svg.setAttribute('viewBox',a.map(n=>n.toFixed(1)).join(' '))}
+function animVB(to){
+  cancelAnimationFrame(animVB.raf);
+  if(reduced){setVB(to);return}
+  const from=vb.slice(),t0=performance.now(),D=450;
+  const step=now=>{let k=Math.min(1,(now-t0)/D);k=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+    setVB(from.map((f,i)=>f+(to[i]-f)*k));if(k<1)animVB.raf=requestAnimationFrame(step)};
+  animVB.raf=requestAnimationFrame(step);
+}
+function targetFor(p){
+  const r=stage.getBoundingClientRect();const a=r.height/Math.max(1,r.width);
+  const w=p.zw||320,h=w*a;return [p.z[0]-w/2,p.z[1]-h/2,w,h];
+}
+function highlight(id){
+  document.querySelectorAll('svg .part').forEach(g=>g.classList.toggle('on',g.dataset.part===id));
+  document.querySelectorAll('svg .lbl,svg .dot').forEach(g=>g.classList.toggle('on',g.dataset.part===id));
+}
+
+/* ======================= RAD-VIEWS ======================= */
+const GROUPS=['Antrieb','Bremsen','Laufräder','Cockpit & Lenkung','Rahmen & Sitz'];
+function renderOverview(){
+  panel.innerHTML=`<div class="groups">${GROUPS.map(g=>`<h2>${esc(g)}</h2><ul class="rows">${PARTS.filter(p=>p.g===g).map(p=>`<li><button data-go="#/rad/${p.id}"><span class="nm">${esc(p.n)}</span><span class="ds">${esc(p.short)}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></li>`).join('')}</ul>`).join('')}</div>
+  <p class="disclaimer">Diese Anleitungen sind allgemein für Gravel- und Rennräder geschrieben und ersetzen nicht die Anleitung deines Herstellers. Drehmomente, Verschleißgrenzen und Medien stehen dort oder auf dem Bauteil. Bei Bremsen, Lenkung und Laufrädern gilt im Zweifel: Werkstatt.</p>`;
+}
+function tabFunktion(p){
+  return `<p class="lead-p">${fmt(p.what)}</p><h3>So funktioniert es</h3><p>${fmt(p.how)}</p>
+  <h3>Verschleiß erkennen</h3><ul>${p.wear.map(w=>`<li>${fmt(w)}</li>`).join('')}</ul>`;
+}
+function tabWartung(p){
+  return p.tasks.map((t,i)=>`<details class="task"${i===0?' open':''}><summary><span class="tt">${esc(t.t)}</span>${lv(t.lv)}<span class="iv">${esc(t.iv)}</span></summary>
+   <div class="tbody"><ol>${t.steps.map(s=>`<li>${fmt(s)}</li>`).join('')}</ol>
+   ${t.tools.length?`<p class="chips-l">Werkzeug</p><div class="chips">${t.tools.map(chip).join('')}</div>`:'<p class="chips-l">Kein Werkzeug nötig</p>'}
+   ${t.note?`<div class="note">${fmt(t.note)}</div>`:''}</div></details>`).join('')
+  +`<div class="shop"><h3>Lieber in die Werkstatt, wenn …</h3><p>${fmt(p.shop)}</p></div>`;
+}
+function tabWerkzeug(p){
+  const ids=toolsOf(p);
+  if(!ids.length)return '<p>Für die Kontrollen an diesem Bauteil brauchst du kein Werkzeug.</p>';
+  return `<p>Alles, was für die Arbeiten an diesem Bauteil gebraucht wird. Hake ab, was du schon hast – das gilt auch in der Werkzeugliste.</p>
+  <ul class="cl">${ids.map(id=>`<li><input type="checkbox" id="o-${id}" data-own="${id}"${owned.has(id)?' checked':''}><label for="o-${id}">${esc(TOOLS[id].n)}<small>${esc(KIND[TOOLS[id].k])} – ${esc(TOOLS[id].d)}</small></label></li>`).join('')}</ul>`;
+}
+function renderDetail(p){
+  const i=PARTS.indexOf(p),prev=PARTS[(i-1+PARTS.length)%PARTS.length],next=PARTS[(i+1)%PARTS.length];
+  panel.innerHTML=`<div class="dhead"><div><p class="grp">${esc(p.g)}</p><h2>${esc(p.n)}</h2></div><button class="back" data-go="#/rad">Übersicht</button></div>
+  <div class="seg" role="tablist">${['Funktion','Wartung','Werkzeug'].map((t,k)=>`<button role="tab" data-tab="${k}" aria-selected="${k===dtab}">${t}</button>`).join('')}</div>
+  <div class="tabbody">${[tabFunktion,tabWartung,tabWerkzeug][dtab](p)}</div>
+  <div class="dfoot"><button class="btn ghost" data-act="mdpart">Als Markdown kopieren</button>
+  <div class="pn"><button class="btn ghost" data-go="#/rad/${prev.id}">‹ ${esc(prev.n)}</button><button class="btn ghost" data-go="#/rad/${next.id}">${esc(next.n)} ›</button></div></div>`;
+}
+
+/* ======================= INSPEKTION ======================= */
+function inspStats(){let all=0,done=0;INSP.forEach((s,i)=>s.checks.forEach((c,j)=>{all++;if(checks[i+'-'+j])done++}));return{all,done}}
+function renderInsp(){
+  const {all,done}=inspStats();
+  $('#v-insp').innerHTML=`<div class="vhead"><h2>Inspektion</h2>
+  <p>Eine Runde in Werkstatt-Reihenfolge: von groben Sichtprüfungen zu den Feinheiten, am Ende die Probefahrt. Dein Fortschritt bleibt in diesem Browser gespeichert. Plane beim ersten Mal reichlich Zeit ein.</p>
+  <div class="prog"><div style="width:${all?done/all*100:0}%"></div></div><span class="progt">${done} von ${all} Punkten erledigt</span></div>
+  <div class="panel">${INSP.map((s,i)=>{const fin=s.checks.every((c,j)=>checks[i+'-'+j]);const n=s.checks.filter((c,j)=>checks[i+'-'+j]).length;
+   return `<details class="step${fin?' done':''}" data-step="${i}"${openSteps.has(i)?' open':''}><summary><span class="num">${i+1}</span><span class="st"><b>${esc(s.t)}</b><small>${n} von ${s.checks.length}</small></span></summary>
+   <div class="sbody"><ul class="cl">${s.checks.map((c,j)=>`<li><input type="checkbox" id="c-${i}-${j}" data-chk="${i}-${j}"${checks[i+'-'+j]?' checked':''}><label for="c-${i}-${j}">${esc(c)}</label></li>`).join('')}</ul>
+   ${s.note?`<div class="note">${esc(s.note)}</div>`:''}
+   ${s.tools.length?`<p class="chips-l">Werkzeug</p><div class="chips">${s.tools.map(chip).join('')}</div>`:''}
+   <p class="chips-l">Problem gefunden? Hier steht, was zu tun ist:</p><div class="links">${s.parts.map(id=>`<button class="chip" data-go="#/rad/${id}" data-tabset="1">${esc(byId[id].n)}</button>`).join('')}</div></div></details>`}).join('')}
+  <div class="btnrow"><button class="btn" data-act="mdinsp">Checkliste als Markdown kopieren</button><button class="btn ghost" data-act="resetinsp">Zurücksetzen</button></div></div>`;
+}
+
+/* ======================= WERKZEUG ======================= */
+function usedBy(id){return PARTS.filter(p=>toolsOf(p).includes(id))}
+function renderTools(){
+  const basis=Object.keys(TOOLS).filter(k=>TOOLS[k].k==='basis');const have=basis.filter(k=>owned.has(k)).length;
+  const desc={basis:'Damit kommst du durch die Inspektion und die meisten Leicht-Arbeiten.',erweitert:'Für Ketten-, Kassetten- und Belagwechsel und ähnliche Mittel-Arbeiten.',werkstatt:'Teuer oder selten gebraucht – lohnt sich meist erst, wenn du viel selbst machst.'};
+  $('#v-tools').innerHTML=`<div class="vhead"><h2>Werkzeug</h2><p>Hake ab, was du schon hast. Fehlende Teile kannst du als Einkaufsliste kopieren.</p>
+  <div class="prog"><div style="width:${have/basis.length*100}%"></div></div><span class="progt">${have} von ${basis.length} Teilen der Grundausstattung vorhanden</span></div>
+  <div class="panel">${Object.keys(KIND).map(k=>`<div class="tsec"><h3>${KIND[k]}</h3><p>${desc[k]}</p><ul class="cl">${Object.keys(TOOLS).filter(id=>TOOLS[id].k===k).map(id=>{const u=usedBy(id);
+   return `<li><input type="checkbox" id="t-${id}" data-own="${id}"${owned.has(id)?' checked':''}><label for="t-${id}">${esc(TOOLS[id].n)}<small>${esc(TOOLS[id].d)}${u.length?' Gebraucht für: '+u.map(p=>p.n).join(', ')+'.':''}</small></label></li>`}).join('')}</ul></div>`).join('')}
+  <div class="btnrow"><button class="btn" data-act="mdshop">Einkaufsliste kopieren</button><button class="btn ghost" data-act="mdtools">Ganze Liste als Markdown</button></div></div>`;
+}
+
+/* ======================= BEGRIFFE ======================= */
+function renderGloss(){
+  $('#v-gloss').innerHTML=`<div class="vhead"><h2>Begriffe</h2><p>Fachwörter, die in den Anleitungen vorkommen. Im Text sind sie gepunktet unterstrichen und lassen sich antippen.</p></div>
+  <div class="panel"><dl class="gl">${Object.keys(GLOSS).sort((a,b)=>a.localeCompare(b,'de')).map(k=>`<dt id="gl-${esc(k)}">${esc(k)}</dt><dd>${esc(GLOSS[k])}</dd>`).join('')}</dl></div>`;
+}
+
+/* ======================= MARKDOWN ======================= */
+function mdPart(p){
+  let s=`# ${p.n}\n\n_${p.g}_\n\n## Funktion\n\n${plain(p.what)}\n\n${plain(p.how)}\n\n## Verschleiß erkennen\n\n${p.wear.map(w=>'- '+plain(w)).join('\n')}\n\n## Wartung\n`;
+  p.tasks.forEach(t=>{s+=`\n### ${t.t}\n\nSchwierigkeit: ${LVN[t.lv]} · Intervall: ${t.iv}\n\n${t.steps.map((x,i)=>`${i+1}. ${plain(x)}`).join('\n')}\n`;
+    if(t.tools.length)s+=`\nWerkzeug: ${t.tools.map(id=>TOOLS[id].n).join(', ')}\n`;if(t.note)s+=`\n> ${plain(t.note)}\n`});
+  s+=`\n## Lieber in die Werkstatt, wenn …\n\n${plain(p.shop)}\n`;return s;
+}
+function mdInsp(){
+  const d=new Date().toLocaleDateString('de-DE');
+  return `# Inspektion – Checkliste\n\nStand: ${d}\n\n`+INSP.map((s,i)=>`## ${i+1}. ${s.t}\n\n${s.checks.map((c,j)=>`- [${checks[i+'-'+j]?'x':' '}] ${c}`).join('\n')}\n${s.tools.length?`\nWerkzeug: ${s.tools.map(id=>TOOLS[id].n).join(', ')}\n`:''}${s.note?`\n> ${s.note}\n`:''}`).join('\n');
+}
+function mdTools(onlyMissing){
+  return `# ${onlyMissing?'Einkaufsliste Werkzeug':'Werkzeug'}\n\n`+Object.keys(KIND).map(k=>{
+    const ids=Object.keys(TOOLS).filter(id=>TOOLS[id].k===k&&(!onlyMissing||!owned.has(id)));
+    if(!ids.length)return '';
+    return `## ${KIND[k]}\n\n${ids.map(id=>`- [${owned.has(id)?'x':' '}] ${TOOLS[id].n} – ${TOOLS[id].d}`).join('\n')}\n`}).filter(Boolean).join('\n');
+}
+
+/* ======================= ROUTER ======================= */
+function route(){
+  const h=(location.hash||'#/rad').slice(2).split('/');const v=h[0]||'rad';
+  const map={rad:'v-rad',inspektion:'v-insp',werkzeug:'v-tools',begriffe:'v-gloss'};
+  const vid=map[v]||'v-rad';
+  document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!==vid);
+  document.querySelectorAll('.tabs button').forEach(b=>b.toggleAttribute('aria-current',b.dataset.go==='#/'+(map[v]?v:'rad')));
+  document.querySelectorAll('.tabs button[aria-current]').forEach(b=>b.setAttribute('aria-current','page'));
+  if(vid==='v-rad'){
+    const p=byId[h[1]];const rad=$('#v-rad');
+    if(p){
+      const changed=current!==p.id;current=p.id;
+      rad.classList.add('detail');renderDetail(p);highlight(p.id);
+      requestAnimationFrame(()=>animVB(targetFor(p)));
+      if(changed)window.scrollTo(0,0);
+    }else{
+      current=null;rad.classList.remove('detail');renderOverview();highlight(null);animVB(BASE);
+    }
+  }
+  if(vid==='v-insp')renderInsp();
+  if(vid==='v-tools')renderTools();
+  if(vid==='v-gloss')renderGloss();
+  if(vid!=='v-rad')window.scrollTo(0,0);
+}
+addEventListener('hashchange',route);
+addEventListener('resize',()=>{if(current)setVB(targetFor(byId[current]))});
+
+/* ======================= EVENTS ======================= */
+document.addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]');
+  if(go){
+    if(go.dataset.tabset)dtab=1;
+    location.hash=go.dataset.go;closeSheet();return;
+  }
+  const part=e.target.closest('svg [data-part]');
+  if(part){location.hash='#/rad/'+part.dataset.part;return}
+  const tab=e.target.closest('[data-tab]');
+  if(tab){dtab=+tab.dataset.tab;renderDetail(byId[current]);return}
+  const term=e.target.closest('.term');
+  if(term){const k=term.dataset.term;openSheet(`<h3>${esc(k)}</h3><p>${esc(GLOSS[k]||'Keine Erklärung hinterlegt.')}</p><button class="btn ghost" data-act="close">Schließen</button>`);return}
+  const tl=e.target.closest('[data-tool]');
+  if(tl){const id=tl.dataset.tool,t=TOOLS[id];
+    openSheet(`<h3>${esc(t.n)}</h3><p>${esc(t.d)}</p><p style="color:var(--ink2);font-size:14px">${esc(KIND[t.k])}</p>
+    <ul class="cl"><li><input type="checkbox" id="s-${id}" data-own="${id}"${owned.has(id)?' checked':''}><label for="s-${id}">Hab ich</label></li></ul>
+    <div class="btnrow"><button class="btn ghost" data-act="close">Schließen</button></div>`);return}
+  const act=e.target.closest('[data-act]');
+  if(act){const a=act.dataset.act;
+    if(a==='close')closeSheet();
+    if(a==='mdpart')copyMd(mdPart(byId[current]),current+'.md');
+    if(a==='mdinsp')copyMd(mdInsp(),'inspektion.md');
+    if(a==='mdtools')copyMd(mdTools(false),'werkzeug.md');
+    if(a==='mdshop')copyMd(mdTools(true),'einkaufsliste.md');
+    if(a==='resetinsp'){if(confirm('Alle Häkchen der Inspektion zurücksetzen?')){checks={};store.set('checks',checks);renderInsp()}}
+    if(a==='dlmd'&&dl){dl.save({filename:act.dataset.fn,data:copyMd.last}).catch(()=>toast('Speichern abgebrochen'))}
+  }
+});
+$('#scrim').addEventListener('click',closeSheet);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeSheet();
+  if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('svg .lbl')){e.preventDefault();location.hash='#/rad/'+e.target.closest('svg .lbl').dataset.part}
+});
+document.addEventListener('change',e=>{
+  const o=e.target.dataset&&e.target.dataset.own;
+  if(o){e.target.checked?owned.add(o):owned.delete(o);store.set('owned',[...owned]);
+    document.querySelectorAll(`[data-own="${o}"]`).forEach(x=>x.checked=owned.has(o));
+    document.querySelectorAll(`.chip[data-tool="${o}"]`).forEach(x=>x.classList.toggle('have',owned.has(o)));
+    if(!$('#v-tools').hidden)renderTools();return}
+  const c=e.target.dataset&&e.target.dataset.chk;
+  if(c){checks[c]=e.target.checked;if(!e.target.checked)delete checks[c];store.set('checks',checks);
+    const i=+c.split('-')[0];openSteps.add(i);renderInsp();}
+});
+document.addEventListener('toggle',e=>{
+  const d=e.target;if(d.classList&&d.classList.contains('step')){const i=+d.dataset.step;d.open?openSteps.add(i):openSteps.delete(i)}
+},true);
+
+route();
+initDownloads();
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
+  addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
