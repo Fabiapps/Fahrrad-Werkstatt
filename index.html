@@ -39,6 +39,8 @@ a{color:var(--steel)}
 .top{max-width:760px;margin:0 auto;padding:14px 18px 4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .top h1{font-size:26px;font-weight:700;letter-spacing:.01em}
 .top p{margin:0;color:var(--ink2);font-size:14px}
+.top .switch{border:0;border-left:1px solid var(--line);background:none;margin:-6px 0 -6px 8px;padding:6px 0 6px 9px;font-size:14px;font-weight:600;color:var(--steel);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.top .switch[hidden]{display:none}
 
 main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .view[hidden]{display:none}
@@ -65,6 +67,7 @@ svg .lbl.on rect{fill:var(--sig)}
 svg .lbl.on text{fill:#1D2528}
 .rad.detail svg .lbl,.rad.detail svg .lead{display:none}
 .rad:not(.detail) svg .dot{display:none}
+svg .deco{fill:none;stroke:var(--ink2);stroke-width:5;stroke-linecap:round;opacity:.45;pointer-events:none}
 
 .panel{max-width:760px;margin:0 auto;padding:12px 18px 24px}
 .groups h2{font-size:15px;font-weight:600;color:var(--ink2);margin:22px 0 6px;font-family:var(--body)}
@@ -153,6 +156,21 @@ details.step.done .num{background:var(--sig);border-color:var(--sig);color:#1D25
 .links{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .links .chip{background:var(--sheet);border-color:var(--steel);color:var(--steel);font-weight:600}
 
+/* ---------- Start ---------- */
+.bikes{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.bikecard{all:unset;box-sizing:border-box;display:flex;gap:14px;align-items:center;width:100%;padding:14px;background:var(--sheet);border:1px solid var(--line);border-radius:14px;cursor:pointer}
+.bikecard:focus-visible{outline:3px solid var(--steel);outline-offset:2px}
+.bikecard.on{border-color:var(--hl);box-shadow:inset 0 0 0 1px var(--hl)}
+.bikecard svg{flex:0 0 auto;width:104px;height:auto;color:var(--ink)}
+.bikecard .bt{flex:1;min-width:0}
+.bikecard .bn{display:block;font-family:var(--cond);font-weight:700;font-size:25px;line-height:1.1}
+.bikecard .bd{display:block;color:var(--ink2);font-size:14px;margin-top:3px}
+.bikecard .bf{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.bikecard .bf span{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:1px 9px;font-size:13px}
+.bikecard .act{display:block;margin-top:8px;font-size:13px;font-weight:600;color:var(--steel)}
+.groups details.task{margin-top:14px}
+@media (max-width:380px){.bikecard svg{width:78px}}
+
 /* ---------- Werkzeug / Begriffe ---------- */
 .tsec h3{font-size:22px;font-weight:600;margin:24px 0 2px}
 .tsec > p{margin:0 0 6px;color:var(--ink2);font-size:14px}
@@ -161,6 +179,7 @@ details.step.done .num{background:var(--sig);border-color:var(--sig);color:#1D25
 
 /* ---------- Nav ---------- */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--sheet);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs[hidden]{display:none}
 .tabs .in{display:flex;width:100%;max-width:760px}
 .tabs button{flex:1;border:0;background:none;padding:8px 2px 9px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer}
 .tabs button svg{width:24px;height:24px}
@@ -190,7 +209,7 @@ details.step.done .num{background:var(--sig);border-color:var(--sig);color:#1D25
 <body>
 <header class="top">
   <h1>Fahrrad-Werkstatt</h1>
-  <p>für Gravel- und Rennräder</p>
+  <p><span id="sub">für Gravel- und Rennräder</span><button class="switch" id="switch" data-go="#/start" hidden>Rad wechseln</button></p>
 </header>
 
 <main>
@@ -200,6 +219,8 @@ details.step.done .num{background:var(--sig);border-color:var(--sig);color:#1D25
       <svg id="bike" viewBox="0 0 1000 810" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Schematische Seitenansicht eines Gravelbikes mit tippbaren Bauteilen">
         <line class="ground" x1="0" y1="722" x2="1000" y2="722"/>
 
+        <!-- ===== Gravelbike ===== -->
+        <g class="art" data-bike="gravel">
         <g class="part" id="g-laufrad" data-part="laufrad">
           <g id="spokesR"></g><g id="spokesF"></g>
           <circle cx="215" cy="530" r="165" fill="none" stroke="currentColor" stroke-width="10"/>
@@ -308,6 +329,138 @@ details.step.done .num{background:var(--sig);border-color:var(--sig);color:#1D25
           <line x1="318" y1="220" x2="374" y2="215" stroke="currentColor" stroke-width="4"/>
           <rect x="337" y="208" width="18" height="12" rx="2" fill="currentColor"/>
         </g>
+        </g>
+
+        <!-- ===== Brompton C Line ===== -->
+        <g class="art" data-bike="brompton" display="none">
+          <g class="part" data-part="laufrad">
+            <g id="bspokesR"></g><g id="bspokesF"></g>
+            <circle cx="200" cy="602" r="103" fill="none" stroke="currentColor" stroke-width="8"/>
+            <circle cx="794" cy="602" r="103" fill="none" stroke="currentColor" stroke-width="8"/>
+            <circle cx="794" cy="602" r="10" fill="currentColor"/>
+          </g>
+
+          <g class="part" data-part="reifen">
+            <circle cx="200" cy="602" r="112" fill="none" stroke="currentColor" stroke-width="16" opacity=".9"/>
+            <circle cx="794" cy="602" r="112" fill="none" stroke="currentColor" stroke-width="16" opacity=".9"/>
+            <circle cx="200" cy="602" r="122" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="3 7"/>
+            <circle cx="794" cy="602" r="122" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="3 7"/>
+            <rect x="196" y="499" width="8" height="16" rx="2" fill="currentColor"/>
+          </g>
+
+          <!-- Schutzbleche, nicht antippbar -->
+          <path class="deco" d="M72,580 A130,130 0 0 1 265,489"/>
+          <path class="deco" d="M687,527 A130,130 0 0 1 922,579"/>
+
+          <g class="part" data-part="hinterbau" fill="none" stroke="currentColor" stroke-linecap="round">
+            <line x1="410" y1="566" x2="200" y2="602" stroke-width="11"/>
+            <line x1="200" y1="602" x2="352" y2="492" stroke-width="10"/>
+            <line x1="352" y1="492" x2="410" y2="566" stroke-width="9"/>
+            <circle cx="410" cy="566" r="9" fill="currentColor" stroke="none"/>
+          </g>
+
+          <g class="part" data-part="rahmen" fill="none" stroke="currentColor" stroke-linecap="round">
+            <line x1="430" y1="590" x2="346" y2="360" stroke-width="16"/>
+            <line x1="381" y1="455" x2="528" y2="433" stroke-width="24"/>
+            <line x1="553" y1="429" x2="700" y2="407" stroke-width="24"/>
+            <line x1="690" y1="377" x2="710" y2="437" stroke-width="26" stroke-linecap="butt"/>
+            <rect x="-7" y="-15" width="14" height="30" rx="3" fill="currentColor" stroke="none" transform="translate(718,401) rotate(-18)"/>
+          </g>
+
+          <g class="part" data-part="federelement">
+            <rect x="-14" y="-11" width="28" height="22" rx="7" fill="currentColor" transform="translate(372,488) rotate(-20)"/>
+            <circle cx="372" cy="488" r="3.5" fill="var(--paper)"/>
+          </g>
+
+          <g class="part" data-part="gabel">
+            <path d="M712,444 C732,506 752,560 794,602" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+            <circle cx="794" cy="602" r="9" fill="currentColor"/>
+          </g>
+
+          <g class="part" data-part="steuersatz">
+            <rect x="-19" y="-5" width="38" height="10" rx="3" fill="currentColor" transform="translate(689,373) rotate(-18)"/>
+            <rect x="-19" y="-5" width="38" height="10" rx="3" fill="currentColor" transform="translate(711,441) rotate(-18)"/>
+          </g>
+
+          <g class="part" data-part="bremse">
+            <rect x="-26" y="-8" width="52" height="16" rx="6" fill="currentColor" transform="translate(731,482) rotate(61)"/>
+            <rect x="-12" y="-5" width="24" height="10" rx="3" fill="currentColor" transform="translate(750,517) rotate(-27)"/>
+            <circle cx="712" cy="448" r="6" fill="var(--paper)" stroke="currentColor" stroke-width="3"/>
+            <rect x="-16" y="-8" width="32" height="16" rx="6" fill="currentColor" transform="translate(298,531) rotate(-36)"/>
+            <rect x="-11" y="-5" width="22" height="10" rx="3" fill="currentColor" transform="translate(279,545) rotate(54)"/>
+            <path d="M310,520 Q336,500 360,478" fill="none" stroke="currentColor" stroke-width="3"/>
+          </g>
+
+          <g class="part" data-part="scharnier">
+            <rect x="-15" y="-19" width="30" height="38" rx="6" fill="currentColor" transform="translate(540,431) rotate(-9)"/>
+            <path d="M545,447 L557,476" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+            <circle cx="558" cy="479" r="7" fill="currentColor"/>
+            <circle cx="540" cy="431" r="5" fill="var(--paper)"/>
+            <rect x="-15" y="-12" width="30" height="24" rx="5" fill="currentColor" transform="translate(681,348) rotate(-18)"/>
+            <path d="M693,351 L719,358" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="721" cy="359" r="6" fill="currentColor"/>
+            <circle cx="681" cy="348" r="4" fill="var(--paper)"/>
+          </g>
+
+          <g class="part" data-part="nabe">
+            <circle cx="200" cy="602" r="24" fill="none" stroke="currentColor" stroke-width="6"/>
+            <path d="M200,602 L228,594" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="4 2"/>
+          </g>
+
+          <g class="part" data-part="kette" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="7 3">
+            <path d="M430,535 L200,587"/>
+            <path d="M430,645 L258,679 M249,673 L223,643 L203,617"/>
+            <circle cx="200" cy="602" r="15" stroke-width="4" stroke-dasharray="none"/>
+            <circle cx="200" cy="602" r="18" stroke-width="3" stroke-dasharray="2 3"/>
+          </g>
+
+          <g class="part" data-part="spanner">
+            <line x1="207" y1="610" x2="256" y2="670" stroke="currentColor" stroke-width="10" stroke-linecap="round"/>
+            <circle cx="228" cy="636" r="10" fill="var(--paper)" stroke="currentColor" stroke-width="4"/>
+            <circle cx="256" cy="670" r="10" fill="var(--paper)" stroke="currentColor" stroke-width="4"/>
+          </g>
+
+          <g class="part" data-part="kurbel">
+            <circle cx="430" cy="590" r="54" fill="none" stroke="currentColor" stroke-width="7"/>
+            <circle cx="430" cy="590" r="59" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="3 4"/>
+            <line x1="430" y1="590" x2="510" y2="640" stroke="currentColor" stroke-width="14" stroke-linecap="round"/>
+          </g>
+
+          <g class="part" data-part="tretlager">
+            <circle cx="430" cy="590" r="17" fill="currentColor"/>
+            <circle cx="430" cy="590" r="6" fill="var(--paper)"/>
+          </g>
+
+          <g class="part" data-part="pedal">
+            <rect x="488" y="633" width="44" height="14" rx="4" fill="currentColor"/>
+            <circle cx="510" cy="640" r="5" fill="var(--paper)"/>
+          </g>
+
+          <g class="part" data-part="lenker" fill="none" stroke="currentColor" stroke-linecap="round">
+            <line x1="688" y1="371" x2="685" y2="361" stroke-width="16"/>
+            <line x1="676" y1="335" x2="614" y2="144" stroke-width="15"/>
+            <path d="M614,144 C604,130 590,124 572,126 C562,127 556,130 550,134" stroke-width="11"/>
+            <line x1="550" y1="134" x2="522" y2="150" stroke-width="18"/>
+          </g>
+
+          <g class="part" data-part="hebel">
+            <rect x="-9" y="-7" width="18" height="14" rx="3" fill="currentColor" transform="translate(560,136) rotate(-30)"/>
+            <path d="M566,140 C580,146 592,156 600,168" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            <rect x="-11" y="-6" width="22" height="12" rx="4" fill="currentColor" transform="translate(545,155) rotate(-30)"/>
+          </g>
+
+          <g class="part" data-part="stuetze">
+            <line x1="350" y1="372" x2="288" y2="200" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+            <path d="M352,366 L380,378" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="349" cy="365" r="7" fill="currentColor"/>
+          </g>
+
+          <g class="part" data-part="sattel">
+            <path d="M236,186 C250,174 290,172 316,176 L344,184 C350,188 344,194 332,195 L252,198 C238,198 232,192 236,186 Z" fill="currentColor"/>
+            <line x1="262" y1="201" x2="318" y2="198" stroke="currentColor" stroke-width="4"/>
+            <rect x="279" y="196" width="18" height="11" rx="2" fill="currentColor"/>
+          </g>
+        </g>
 
         <g id="labels"></g>
       </svg>
@@ -316,6 +469,8 @@ details.step.done .num{background:var(--sig);border-color:var(--sig);color:#1D25
     <div class="panel" id="panel"></div>
   </section>
 
+  <!-- ===================== START ===================== -->
+  <section class="view" id="v-start" hidden></section>
   <!-- ===================== INSPEKTION ===================== -->
   <section class="view" id="v-insp" hidden></section>
   <!-- ===================== WERKZEUG ===================== -->
@@ -370,7 +525,9 @@ const TOOLS = {
   innenlager:{n:'Innenlagerwerkzeug',k:'werkstatt',d:'Systemspezifisch: Schlüssel für geschraubte Lager oder Auspresswerkzeug für Pressfit.'},
   entlueft:{n:'Entlüftungskit',k:'werkstatt',d:'Herstellerspezifisch, inklusive passendem Bremsmedium (Mineralöl oder DOT).'},
   schaltauge:{n:'Schaltaugen-Richtlehre',k:'werkstatt',d:'Misst und richtet ein verbogenes Schaltauge. Teuer und selten gebraucht.'},
-  zentrier:{n:'Zentrierständer',k:'werkstatt',d:'Für präzises Zentrieren von Laufrädern. Für gelegentliche Korrekturen geht es auch im Rahmen.'}
+  zentrier:{n:'Zentrierständer',k:'werkstatt',d:'Für präzises Zentrieren von Laufrädern. Für gelegentliche Korrekturen geht es auch im Rahmen.'},
+  maul:{n:'Maul- oder Ringschlüssel 15 mm',k:'basis',d:'Für Achsmuttern und die Mutter des Kettenspanners. Ein kleiner Satz von 8 bis 15 mm deckt auch die übrigen Muttern ab.'},
+  steuersatzschl:{n:'Zwei flache Steuersatzschlüssel (36 mm)',k:'werkstatt',d:'Für den Gewindesteuersatz: Einer hält die Lagerschale, der andere zieht die Kontermutter. Die Größe stammt aus Händlerangaben – vor dem Kauf an deinem Rad nachmessen.'}
 };
 
 const GLOSS = {
@@ -397,8 +554,26 @@ const GLOSS = {
   'Narrow-Wide':'Kettenblatt mit abwechselnd schmalen und breiten Zähnen. Hält die Kette bei 1x-Antrieben ohne Umwerfer zuverlässig.',
   'Kupplung':'Mechanismus in vielen Gravel-Schaltwerken, der den Schaltwerkkäfig bremst. Verhindert Kettenschlagen und Abspringen auf Schotter. Zum Ausbauen des Hinterrads oft per Hebel oder Knopf lösbar.'
 };
+const GLOSS_B = {
+  'Faltgelenk':'Scharnier im Hauptrahmen und am Lenkervorbau. Es dreht sich um einen Stahlbolzen und wird mit einem Klemmhebel und einer Klemmplatte geschlossen. Beim Fahren muss der Hebel immer fest zugedreht sein.',
+  'Klemmplatte':'Die Metallplatte am Faltgelenk, die der Klemmhebel gegen die beiden Gelenkhälften zieht. Sie nutzt sich mit der Zeit ab. Laut Brompton ist sie zu tauschen, wenn sie die Gelenkhälften fast berührt.',
+  'Federelement':'Elastomer-Puffer zwischen Hinterbau und Hauptrahmen (englisch „suspension block"). Federt kleine Stöße ab und trägt den ausgeklappten Hinterbau. Es gibt verschiedene Härten.',
+  'Hinterbau':'Der hintere Rahmenteil mit dem Hinterrad. Er ist über ein Drehgelenk nahe am Tretlager mit dem Hauptrahmen verbunden und klappt beim Falten unter den Rahmen.',
+  'Kettenspanner':'Federnder Arm mit zwei Röllchen, der die Kette straff hält. Beim Brompton nötig, weil sich der Hinterbau beim Federn und Falten bewegt. Bei Modellen mit mehreren Ritzeln gleicht er zusätzlich die unterschiedliche Kettenlänge aus.',
+  'Kettenschieber':'Bei 2- und 6-Gang-Bromptons (bis Modelljahr 2024) schiebt ein kleiner Stößel die Kette zwischen den zwei Ritzeln hin und her. Bedient wird er über einen eigenen Schalthebel, beim 6-Gang über den linken.',
+  'Nabenschaltung':'Gänge im Inneren der Hinterradnabe. Gut gegen Dreck geschützt und auch im Stand schaltbar. Beim Brompton C Line eine 3-Gang-Nabe, laut Hersteller- und Händlerangaben von Sturmey-Archer gefertigt. Beim 6- und 12-Gang kommt sie mit mehreren Ritzeln außen zusammen.',
+  'Schaltkettchen':'Kleine Kette, die rechts aus der Hinterachse einer Nabenschaltung kommt (englisch „indicator chain"). Sie verbindet den Schaltzug mit dem Schaltstift in der Nabe. Empfindlich – beim Hinterradausbau wird sie abgeschraubt.',
+  'Felgenbremse':'Bremse, bei der zwei Beläge seitlich auf die Felge drücken. Leicht und einfach zu warten, bei Nässe aber weniger bissig als eine Scheibenbremse. Das Brompton C Line nutzt Doppelgelenkbremsen („Dual Pivot").',
+  'Felgenverschleiß':'Felgenbremsen schleifen bei jeder Bremsung auch ein wenig die Felge ab. Wird die Bremsflanke zu dünn, kann die Felge durch den Reifendruck aufplatzen. Manche Felgen haben eine Verschleißmarkierung; im Zweifel misst der Händler die Wandstärke.',
+  'Vorspur':'Den Bremsbelag so ausrichten, dass sein vorderes Ende (in Fahrtrichtung) die Felge einen Hauch früher berührt als das hintere. Das verringert Quietschen. Brompton-Beläge haben dafür laut Datenblatt drei kleine Erhebungen am hinteren Ende.',
+  'Schrader und Presta':'Zwei Ventiltypen. Schrader ist das Autoventil, dick und mit Federstift. Presta (auch Sclaverand oder französisch) ist schlanker und hat eine Rändelmutter, die man vor dem Pumpen aufdreht. Am Brompton findet man oft Schrader, je nach Schlauch auch Presta.',
+  'Gewindesteuersatz':'Ältere Steuersatz-Bauart: Eine Lagerschale wird auf den Gabelschaft mit Gewinde geschraubt und mit einer Kontermutter gesichert. Beim Brompton braucht man dafür laut Händlern zwei flache 36-mm-Schlüssel.',
+  'Achsmutter':'Mutter, die ein Laufrad im Ausfallende hält – beim Brompton statt Schnellspanner oder Steckachse, meist mit 15-mm-Schlüssel. Darunter sitzen Sicherungsscheiben mit einer Nase, die ins Ausfallende greift.',
+  'Sattelstützenführung':'Kunststoffhülse oben im Sitzrohr, in der die Sattelstütze gleitet. Sie nutzt sich ab. Laut Brompton ist sie fällig, wenn sich die Stütze nur noch schwer verstellen lässt oder an der Klemmschraube vier oder mehr Gewindegänge zu sehen sind.'
+};
+const ALLGLOSS = {...GLOSS, ...GLOSS_B};
 
-const PARTS = [
+const GRAVEL_PARTS = [
  /* -------- ANTRIEB -------- */
  {id:'kette',n:'Kette',g:'Antrieb',a:[340,511],l:[300,460],z:[330,575],zw:470,
   short:'Überträgt deine Kraft aufs Hinterrad',
@@ -700,7 +875,7 @@ const PARTS = [
   shop:'Stütze sitzt fest und lässt sich nicht herausziehen – nicht mit Gewalt arbeiten.'}
 ];
 
-const INSP = [
+const GRAVEL_INSP = [
  {t:'Vorbereitung',parts:['rahmen'],tools:['reiniger','lappen','staender','handschuhe'],
   checks:['Rad gereinigt – Schäden sieht man nur an einem sauberen Rad','Gutes Licht und Platz','Rad im Montageständer oder sicher angelehnt','Werkzeug bereitgelegt']},
  {t:'Rahmen und Gabel',parts:['rahmen','gabel'],tools:[],
@@ -734,20 +909,452 @@ const INSP = [
   checks:['Bremsen erst langsam, dann kräftig getestet','Alle Gänge unter Last geschaltet','Keine ungewohnten Geräusche','Lenkung frei und gerade']}
 ];
 
+/* -------- BROMPTON C LINE -------- */
+const BROMPTON_PARTS = [
+ /* -------- FALTMECHANIK -------- */
+ {id:'scharnier',n:'Faltgelenke',lab:'Faltgelenk',g:'Faltmechanik',a:[540,431],l:[535,300],z:[610,390],zw:340,
+  short:'Scharniere in Hauptrahmen und Lenkervorbau',
+  what:'Die zwei Scharniere, mit denen du Hauptrahmen und Lenkervorbau faltest. Beim Fahren sind sie sicherheitskritisch: Ein offenes oder lockeres Gelenk kann zum Sturz führen.',
+  how:'Jedes {{Faltgelenk}} dreht sich um einen Stahlbolzen. Geschlossen wird es mit einem Klemmhebel, der eine {{Klemmplatte}} gegen die beiden Gelenkhälften zieht. Der Hebel ist dabei selbst die Schraube: Zum Falten drehst du ihn ein paar Umdrehungen auf, zum Fahren kräftig von Hand wieder fest. Bolzen und Klemmplatte nutzen sich mit der Zeit ab.',
+  wear:['Gelenk hat Spiel, obwohl der Hebel fest zugedreht ist','Der Spalt zwischen Klemmplatte und Gelenkhälften wird kleiner – die Platte berührt die Gelenke fast','Klemmhebel lässt sich schwer drehen oder das Gewinde knirscht','Knacken aus dem Rahmen- oder Vorbaubereich beim Antritt'],
+  tasks:[
+   {t:'Klemmhebel prüfen',lv:1,iv:'vor jeder Fahrt',
+    steps:['Beide Klemmhebel – am Hauptrahmen und am Lenkervorbau – kräftig von Hand festdrehen.','Die Klemmplatte muss sauber über beiden Gelenkhälften sitzen.','Kurz an Lenker und Rahmen rütteln: Nichts darf sich bewegen oder klacken.'],
+    tools:[],
+    note:'Nie mit offenem oder nur halb zugedrehtem Gelenk losfahren – auch nicht für ein paar Meter.'},
+   {t:'Gelenke reinigen und ölen',lv:1,iv:'etwa monatlich',
+    steps:['Gelenk öffnen und Schmutz von Gelenk und Klemmflächen wischen.','Ein paar Tropfen Kettenöl auf den Gelenkbolzen und auf das Gewinde des Klemmhebels geben – so empfiehlt es Brompton.','Gelenk einige Male öffnen und schließen, dann überschüssiges Öl gründlich abwischen. Es zieht sonst Dreck an.','Gelenk schließen und den Hebel wieder fest zudrehen.'],
+    tools:['oel','lappen']},
+   {t:'Gelenkspiel prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Hauptgelenk: Klemmhebel lösen, das Gelenk aber geschlossen lassen. Vorder- und Hinterteil des Rahmens gegeneinander auf und ab drücken – es soll kein Spiel spürbar sein.','Vorbaugelenk: genauso – Hebel lösen, Gelenk geschlossen halten und den Lenker vor und zurück drücken.','Beide Hebel wieder fest zudrehen.','Spalt zwischen Klemmplatte und Gelenkhälften ansehen. Berührt die Platte die Gelenke fast, ist sie verschlissen.'],
+    tools:[],
+    note:'Spiel am Gelenkbolzen lässt sich nicht durch festeres Zudrehen beheben. Brompton rät dann ausdrücklich zum Händler.'}
+  ],
+  shop:'Spiel im Gelenk trotz fest zugedrehtem Hebel, eine verschlissene Klemmplatte, Risse oder Verformungen am Gelenk – oder wenn sich der Hebel nicht mehr richtig festdrehen lässt.'},
+
+ {id:'federelement',n:'Federelement',g:'Faltmechanik',a:[372,488],l:[130,330],z:[372,488],zw:200,
+  short:'Gummipuffer zwischen Hinterbau und Rahmen',
+  what:'Ein Gummipuffer (Elastomer) zwischen {{Hinterbau}} und Hauptrahmen. Er federt kleine Stöße ab und trägt den ausgeklappten Hinterbau.',
+  how:'Beim Fahren drückt dein Gewicht den Hinterbau gegen das {{Federelement}}. Es gibt verschiedene Härten; laut Brompton entspricht der heutige Standardpuffer dem früheren „Firm". Bei vielen Modellen wirkt das Federelement mit einer Verriegelung zusammen, die den Hinterbau beim Anheben ausgeklappt hält. Brompton beschreibt, wie man es so einstellt, dass es einrastet oder der Hinterbau immer frei klappt.',
+  wear:['Risse, Ausbrüche oder bröseliges Gummi','Heck fühlt sich deutlich weicher an als früher','Hinterbau wackelt seitlich – das kommt allerdings meist vom Drehgelenk des Hinterbaus, nicht vom Puffer'],
+  tasks:[
+   {t:'Sichtprüfung',lv:1,iv:'bei jeder Inspektion',
+    steps:['Hinterbau ein Stück einklappen, damit du das Federelement gut siehst.','Gummi auf Risse und Ausbrüche ansehen, die Befestigung auf festen Sitz prüfen.','Mit einem feuchten Tuch sauber wischen.'],
+    tools:['lappen']},
+   {t:'Federelement tauschen',lv:2,iv:'bei Rissen oder wenn das Heck zu weich geworden ist',
+    steps:['Ersatzteil passend zu deinem Modell besorgen – Brompton bietet es als Set mit Schraube und Scheibe an.','Hinterbau einklappen, die Befestigungsschraube lösen und das alte Element abnehmen.','Neues Element montieren und die Schraube festziehen.','Verriegelung nach Anleitung einstellen und Falten und Entfalten testen.'],
+    tools:['inbus'],
+    note:'Brompton hat dazu eine eigene Support-Seite („Adjusting and replacing the suspension block"). Die Handgriffe im Detail kenne ich nicht sicher – schau sie dir vorher an, auch welches Werkzeug die Schraube braucht.'}
+  ],
+  shop:'Der Hinterbau lässt sich trotz neuem Federelement seitlich bewegen – dann ist eher das Drehgelenk verschlissen.'},
+
+ {id:'hinterbau',n:'Hinterbau',g:'Faltmechanik',a:[250,566],l:[120,420],z:[305,560],zw:360,
+  short:'Klappt mit dem Hinterrad unter den Rahmen',
+  what:'Der hintere Rahmenteil, der das Hinterrad hält. Beim Falten schwenkt er samt Rad unter den Hauptrahmen.',
+  how:'Der {{Hinterbau}} ist über ein Drehgelenk nahe am Tretlager mit dem Hauptrahmen verbunden. Ausgeklappt liegt er oben am {{Federelement}} an. An ihm sitzen Hinterrad, {{Kettenspanner}}, hintere Bremse und je nach Ausstattung Schutzblech mit Rollen und Gepäckträger. Seit Modelljahr 2025 hat das C Line laut Händlern einen neuen Hinterbau für die 4- und 12-Gang-Schaltung – Ersatzteile sind daher nicht immer zwischen den Baujahren tauschbar.',
+  wear:['Seitliches Spiel am Hinterrad, wenn der Hinterbau frei hängt','Knacken oder Knarzen beim Treten aus dem Bereich hinter dem Tretlager','Rollen am Schutzblech oder Gepäckträger blockieren oder sind abgefahren'],
+  tasks:[
+   {t:'Drehgelenk auf Spiel prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Rad anheben und den Hinterbau aus der Verriegelung lösen, sodass er frei hängt.','Hauptrahmen festhalten und versuchen, den Hinterbau gegen den Rahmen zu verdrehen oder das Hinterrad quer zur Fahrtrichtung zu drücken.','Es soll kein Spiel spürbar sein.'],
+    tools:[],
+    note:'Eine offizielle Toleranz habe ich nicht gefunden. Wenn du dir unsicher bist, ob das schon Spiel ist: beim Händler prüfen lassen.'},
+   {t:'Rollen prüfen und reinigen',lv:1,iv:'gelegentlich – nur wenn dein Brompton Rollen hat',
+    steps:['Rollen am Schutzblech bzw. Gepäckträger drehen: Laufen sie frei?','Haare und Dreck von den Achsen entfernen.','Befestigungsschrauben prüfen.'],
+    tools:['lappen','inbus']}
+  ],
+  shop:'Spiel oder Knacken im Drehgelenk des Hinterbaus – der Lagertausch braucht Spezialwerkzeug und ist Händlersache.'},
+
+ /* -------- ANTRIEB -------- */
+ {id:'kette',n:'Kette',g:'Antrieb',a:[360,551],l:[500,510],z:[320,590],zw:380,
+  short:'Überträgt deine Kraft aufs Hinterrad',
+  what:'Die Kette überträgt die Kraft vom Kettenblatt vorne auf das Ritzel hinten.',
+  how:'Unten läuft sie durch den {{Kettenspanner}}, der sie auf Spannung hält. Welche Kette passt, hängt von Schaltung und Baujahr ab: Ältere Bromptons haben laut Händlern eine breitere 1/8-Zoll-Kette, viele neuere eine 3/32-Zoll-Kette. Für die 4- und 12-Gang-Schaltung ab 2025 habe ich keine verlässliche Angabe gefunden. Mit der Zeit längt sich jede Kette ({{Kettenlängung}}) und nutzt dann Ritzel und Kettenblatt ab.',
+  wear:['Kettenverschleißlehre zeigt Längung über der Grenze','Einzelne steife Glieder – die Kette springt oder rattert','Rost, Quietschen, trockenes Klackern','Kette springt beim kräftigen Antritt über die Zähne'],
+  tasks:[
+   {t:'Reinigen und ölen',lv:1,iv:'laut Brompton etwa monatlich, nach Regenfahrten öfter',
+    steps:['Kette mit einem Lappen abziehen, während du die Pedale rückwärts drehst. Bei starkem Dreck vorher mit Entfetter einsprühen und abbürsten.','Gut trocknen lassen.','Pro Rolle einen Tropfen Öl auf die Innenseite der Kette geben, dabei langsam rückwärts kurbeln.','Ein paar Minuten einziehen lassen und dann außen gründlich abwischen. Beim gefalteten Rad liegt die Kette nah an Hose und Gepäck – je trockener außen, desto weniger Flecken.'],
+    tools:['lappen','reiniger','oel','handschuhe'],
+    note:'Kein Öl auf Felgen und Bremsbeläge – bei Felgenbremsen bremst das Rad sonst deutlich schlechter.'},
+   {t:'Verschleiß messen',lv:1,iv:'alle paar Monate und bei jeder Inspektion',
+    steps:['Kettenverschleißlehre zwischen zwei Rollen einsetzen und auf die Kette legen.','Für Ketten wie diese wird oft 0,75 % als Tauschgrenze genannt. Was deine Lehre und der Kettenhersteller angeben, hat Vorrang.','An zwei, drei Stellen messen.'],
+    tools:['kettenlehre'],
+    note:'Rechtzeitig tauschen spart Geld: Mit einer stark gelängten Kette nutzen sich Ritzel und Kettenblatt mit ab.'},
+   {t:'Kette wechseln',lv:2,iv:'wenn die Verschleißgrenze erreicht ist',
+    steps:['Passende Kette besorgen: Breite und Länge hängen von Schaltung, Kettenblatt und Ritzeln ab. Am sichersten fragst du beim Händler nach der Brompton-Ersatzkette für dein Modell.','Vorher ein Foto machen, wie die Kette durch den Kettenspanner läuft.','Alte Kette am Kettenschloss öffnen oder mit dem Kettennieter trennen.','Neue Kette auf Länge bringen: Glieder der alten Kette zählen und gleich viele nehmen – nicht die Länge vergleichen, die alte ist ja gelängt.','Einfädeln wie auf dem Foto: aufs Kettenblatt, aufs Ritzel und durch die Röllchen des Kettenspanners. Kettenschloss schließen.','Alle Gänge durchschalten, das Rad einmal falten und entfalten und prüfen, dass die Kette nirgends abspringt.'],
+    tools:['schlosszange','kettennieter','kettenlehre','lappen','oel'],
+    note:'Laut einem Händler kommt die Brompton-Ersatzkette mit einem Kettenschloss, das sich ohne Nietwerkzeug öffnen und schließen lässt. Prüf das bei deiner Kette.'}
+  ],
+  shop:'Die Kette springt auch nach dem Wechsel: Dann sind meist Ritzel oder Kettenblatt verschlissen – oder Kettenspanner bzw. Schaltung sind verstellt.'},
+
+ {id:'spanner',n:'Kettenspanner & Kettenschaltung',lab:'Kettenspanner',g:'Antrieb',a:[242,653],l:[150,782],z:[232,640],zw:200,
+  short:'Hält die Kette straff, schaltet bei manchen Modellen',
+  what:'Der federnde Arm mit zwei Röllchen unter der Hinterachse hält die Kette straff. Bei Modellen mit mehreren Ritzeln hinten gehört er zur Kettenschaltung.',
+  how:'Der {{Kettenspanner}} ist nötig, weil sich der Hinterbau beim Federn und Falten bewegt und die Kette trotzdem gespannt bleiben muss. Wie viel Technik hier steckt, hängt von der Schaltung ab: Beim 3-Gang spannt er nur. Beim 2- und 6-Gang (bis Modelljahr 2024) schiebt ein {{Kettenschieber}} die Kette zwischen zwei Ritzeln hin und her. Das 4- und 12-Gang (ab 2025) hat stattdessen ein kleines Brompton-Schaltwerk für vier Ritzel.',
+  wear:['Röllchen verdreckt, wackeln oder haben abgenutzte Zähne','Kette hängt durch oder springt beim Falten ab','Gänge springen oder kommen zögerlich (2-, 4-, 6- und 12-Gang)','Spannarm verbogen, etwa nach dem Umfallen auf die rechte Seite'],
+  tasks:[
+   {t:'Röllchen reinigen und Feder prüfen',lv:1,iv:'bei jeder Kettenpflege',
+    steps:['Kette langsam rückwärts kurbeln und mit Lappen oder alter Zahnbürste die Dreckringe von beiden Röllchen entfernen.','Prüfen, ob sich die Röllchen frei drehen und kein Spiel haben.','Spannarm ein Stück bewegen und loslassen: Er muss von selbst zurückfedern.'],
+    tools:['lappen','reiniger']},
+   {t:'Kettenschieber nachstellen (2- und 6-Gang)',lv:2,iv:'wenn der Wechsel zwischen den zwei Ritzeln hakt',
+    steps:['Zuerst prüfen, ob Kettenschieber und Spannarm sauber sind und sich frei bewegen. Dreck in den Anschlägen ist laut Erfahrungsberichten eine häufige Ursache.','Dann die {{Zugspannung}} in kleinen Schritten an der Einstellmöglichkeit am Schalthebel bzw. am Zug anpassen.','Nach jeder Änderung beide Gänge mehrfach schalten, am besten unter leichter Last.'],
+    tools:['lappen','reiniger'],
+    note:'Die Anschlagschrauben des Kettenschiebers lasse ich hier bewusst weg – Brompton hat dafür ein eigenes Datenblatt. Ohne das lieber zum Händler.'},
+   {t:'Schaltwerk nachstellen (4- und 12-Gang)',lv:2,iv:'wenn Gänge auf den vier Ritzeln nicht sauber kommen',
+    steps:['Die häufigste Ursache ist laut Brompton eine zu geringe Zugspannung, etwa weil sich ein neuer Zug gelängt hat.','Aufs kleinste Ritzel schalten. Die Einstellschraube am Zug eine halbe Umdrehung herausdrehen – das erhöht die Zugspannung.','Durch alle vier Ritzel schalten. Klettert die Kette zu zögerlich auf größere Ritzel: weiter herausdrehen. Kommt sie zu spät aufs kleinere Ritzel zurück: wieder etwas hineindrehen.','Zum Schluss Probefahrt unter Last.'],
+    tools:[],
+    note:'So beschreibt Brompton das Nachstellen der 4-Gang-Kettenschaltung. Die {{Anschlagschrauben}} nur nach Herstellerangabe verstellen.'}
+  ],
+  shop:'Spannarm oder Schaltwerk verbogen, der Kettenschieber lässt sich nicht einstellen, oder du bist dir nicht sicher, welche Schaltung du hast.'},
+
+ {id:'nabe',n:'Nabenschaltung',lab:'Nabe',g:'Antrieb',a:[200,602],l:[360,782],z:[205,600],zw:180,
+  short:'Drei Gänge in der Hinterradnabe (3-, 6- und 12-Gang)',
+  what:'Beim 3-, 6- und 12-Gang-Brompton stecken drei Gänge im Inneren der Hinterradnabe. Das 2- und 4-Gang-Brompton hat keine Nabenschaltung – dann kannst du diesen Teil überspringen.',
+  how:'Die {{Nabenschaltung}} ist gegen Dreck geschützt und lässt sich auch im Stand schalten. Der Schaltzug zieht über das {{Schaltkettchen}} rechts an der Achse einen Stift in der Nabe hin und her. Damit jeder Gang sauber greift, muss die Zugspannung stimmen. Beim 6- und 12-Gang schaltet der rechte Hebel die Nabe und der linke die Ritzel.',
+  wear:['Ein Gang rutscht durch oder springt, besonders beim kräftigen Antritt','Leerlauf beim Treten – die Pedale drehen durch','Gänge lassen sich nur schwer oder gar nicht schalten','Schaltkettchen geknickt, verdreht oder verrostet'],
+  tasks:[
+   {t:'Nabenschaltung einstellen',lv:2,iv:'wenn ein Gang rutscht und nach jedem Hinterradausbau',
+    steps:['Rad entfaltet hinstellen. Das Schaltkettchen muss ganz in die Achse eingeschraubt sein.','In den höchsten Gang schalten, dann den rechten Schalthebel auf die mittlere Stellung. Dabei die Pedale etwas drehen, damit der Gang in der Nabe wirklich greift.','Durch das Loch in der Mutter rechts an der Achse schauen: Die kleine Stufe am Stift des Schaltkettchens soll bündig mit dem Achsende abschließen – höchstens etwa 1 mm darüber.','Passt es nicht: Kontermutter am Zug lösen, die Einstellhülse drehen, bis die Stufe bündig steht, und die Kontermutter wieder festdrehen.','Alle drei Gänge durchschalten und unter Last testen.'],
+    tools:[],
+    note:'So beschreibt es ein Brompton-Datenblatt für die 3-Gang-Nabe. Sehr alte Bromptons mit anderer Nabe werden anders eingestellt. Ein falsch eingestellter Gang kann unter Last durchrutschen – das kann einen Sturz verursachen.'},
+   {t:'Schaltkettchen pflegen',lv:1,iv:'etwa monatlich',
+    steps:['Ein paar Tropfen Kettenöl auf Gewinde und Glieder des Schaltkettchens geben – das empfiehlt Brompton zusammen mit den Faltgelenken.','Überschuss abwischen.','Prüfen, dass das Kettchen gerade aus der Achse kommt und der Zug nicht scheuert.'],
+    tools:['oel','lappen']}
+  ],
+  shop:'Ein Gang rutscht trotz korrekter Einstellung durch, die Nabe macht mahlende Geräusche, oder das Schaltkettchen ist beschädigt. Das Innenleben der Nabe ist Händlersache.'},
+
+ {id:'kurbel',n:'Kurbel & Kettenblatt',lab:'Kurbel',g:'Antrieb',a:[490,628],l:[510,782],z:[455,605],zw:260,
+  short:'Wandelt Trittkraft in Kettenzug um',
+  what:'Die Kurbelarme übertragen deine Beinkraft, das Kettenblatt treibt die Kette an.',
+  how:'Beide Kurbelarme sitzen auf einer gemeinsamen Achse, die durch das Tretlager läuft. Das C Line hat ein einzelnes Kettenblatt – laut Händlerangaben meist mit 50 Zähnen. Viele Bromptons haben zusätzlich einen Kettenschutzring am Kettenblatt, der die Hose sauber hält.',
+  wear:['Spitze, hakenförmige Zähne am Kettenblatt','Knacken bei jeder Kurbelumdrehung','Spiel, wenn man den Kurbelarm seitlich rüttelt','Kettenschutzring gerissen oder verbogen'],
+  tasks:[
+   {t:'Kurbel prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Kurbelarm greifen und quer zur Fahrtrichtung rütteln. Spiel kann vom Kurbelsitz oder vom Tretlager kommen.','Kurbelschrauben und Kettenblattschrauben auf festen Sitz prüfen, mit dem Drehmomentschlüssel auf den Herstellerwert.'],
+    tools:['inbus','drehmo']},
+   {t:'Kettenblatt oder Kurbel tauschen',lv:3,iv:'meist nach mehreren Ketten',
+    steps:['Je nach Baujahr ist das Kettenblatt abschraubbar oder fest mit der Kurbel verbunden.','Für den Kurbelausbau braucht es Spezialwerkzeug passend zum System.','Herstelleranleitung nutzen oder den Händler fragen.'],
+    tools:['innenlager'],
+    note:'Welches Kurbelsystem dein Baujahr hat, konnte ich nicht sicher klären. Kauf Werkzeug erst, wenn du es an deinem Rad nachgeprüft hast.'}
+  ],
+  shop:'Kurbelausbau und Kettenblattwechsel, wenn du dein Kurbelsystem nicht kennst, oder Knacken, das du nicht findest.'},
+
+ {id:'tretlager',n:'Tretlager',g:'Antrieb',a:[430,590],l:[420,690],z:[430,590],zw:200,
+  short:'Lager für die Kurbelachse',
+  what:'Die Lager im Rahmen, in denen sich die Kurbelachse dreht.',
+  how:'Abgedichtete Kugellager im Tretlagergehäuse. Sie sind weitgehend wartungsfrei, verschleißen aber durch Wasser und Dreck.',
+  wear:['Knacken bei jedem Tritt, besonders unter Last','Spiel beim seitlichen Rütteln der Kurbel','Raues oder knirschendes Gefühl beim Drehen der Kurbel'],
+  tasks:[
+   {t:'Tretlager prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Kurbelarm greifen und quer zum Rad rütteln: Spiel?','Kurbel langsam rückwärts drehen und auf raues Laufen achten.','Knacken kann auch vom Klapppedal, von der Sattelstütze oder von den Faltgelenken kommen. Diese zuerst prüfen, bevor du das Tretlager verdächtigst.'],
+    tools:[]},
+   {t:'Tretlager tauschen',lv:3,iv:'bei Spiel oder rauem Lauf',
+    steps:['Kurbel ausbauen (systemabhängig).','Lager mit dem passenden Werkzeug ausbauen.','Sitz reinigen, neues Lager nach Herstelleranleitung montieren.'],
+    tools:['innenlager','drehmo','fett']}
+  ],
+  shop:'Spiel oder rauer Lauf – der Tausch braucht Spezialwerkzeug für Kurbel und Lager.'},
+
+ {id:'pedal',n:'Pedale',g:'Antrieb',a:[510,640],l:[620,690],z:[505,635],zw:200,
+  short:'Rechts fest, links meist klappbar',
+  what:'Rechts sitzt ein normales Pedal. Links hat das Brompton meist ein Klapppedal, das sich beim Falten einklappen lässt, damit das Paket schmal wird.',
+  how:'Pedale drehen sich auf einer Achse mit Lagern und sind in die Kurbel geschraubt. Wichtig: Das linke Pedal hat Linksgewinde, damit es sich beim Treten nicht losdreht. Das Klapppedal hat zusätzlich ein Gelenk, das in beiden Stellungen sauber einrasten muss.',
+  wear:['Spiel in der Pedalachse','Raues Drehen oder Knacken','Klapppedal rastet nicht mehr sauber ein oder wackelt ausgeklappt'],
+  tasks:[
+   {t:'Klapppedal prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Pedal ein- und ausklappen: Es muss in beiden Stellungen sauber einrasten.','Ausgeklappt am Pedal rütteln – es darf nicht wackeln.','Gelenk sauber halten, bei Bedarf einen Tropfen Öl und Überschuss abwischen.'],
+    tools:['lappen','oel']},
+   {t:'Pedale ab- und anbauen',lv:1,iv:'bei Pedalwechsel und einmal im Jahr zum Fetten',
+    steps:['Rechtes Pedal hat Rechtsgewinde, linkes Pedal Linksgewinde.','Merkhilfe: Schlüssel oben an der Pedalachse ansetzen und zum Lösen immer Richtung Hinterrad drücken – das gilt für beide Seiten.','Gewinde reinigen und leicht fetten.','Zum Montieren die ersten Umdrehungen von Hand eindrehen (Pedale sind mit L und R markiert), dann fest anziehen.'],
+    tools:['pedalschl','fett']}
+  ],
+  shop:'Klapppedal wackelt oder rastet nicht mehr ein – meist wird es getauscht statt repariert.'},
+
+ /* -------- BREMSEN -------- */
+ {id:'bremse',n:'Felgenbremse',lab:'Bremse',g:'Bremsen',a:[740,490],l:[595,585],z:[735,485],zw:240,
+  short:'Bremssättel, Beläge und Felgenflanke',
+  what:'Das C Line bremst mit Felgenbremsen: Zwei Beläge drücken seitlich auf die Felge. Das ist leicht und einfach zu warten, bei Nässe aber schwächer als eine Scheibenbremse.',
+  how:'Die {{Felgenbremse}} ist eine Doppelgelenkbremse: Der Bremszug zieht zwei Arme zusammen, die Beläge klemmen die Felge. Mit der Einstellschraube gleichst du Belagverschleiß aus, mit der Zentrierschraube oben am Bremssattel die Seiten. Weil die Beläge auch die Felge abschleifen, gehört der {{Felgenverschleiß}} zur Kontrolle. Öl oder Fett auf Felge und Belägen verringert die Bremswirkung stark.',
+  wear:['Rillen im Belag fast verschwunden','Quietschen oder schleifende Geräusche','Hebel lässt sich weit ziehen, bevor die Bremse greift','Felgenflanke mit tiefen Riefen oder sichtbar hohl gebremst'],
+  tasks:[
+   {t:'Beläge prüfen',lv:1,iv:'etwa monatlich und bei jeder Inspektion',
+    steps:['Die Beläge haben Rillen. Sind sie fast weg, die Beläge tauschen.','Steinchen und Metallsplitter vorsichtig mit einem spitzen Gegenstand aus dem Belag pulen.','Prüfen, dass der Belag ganz auf der Bremsflanke liegt – er darf weder den Reifen berühren noch unten über die Felge ragen.'],
+    tools:[]},
+   {t:'Felge prüfen und reinigen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Bremsflanken mit einem sauberen Tuch und etwas Isopropanol abwischen.','Mit dem Finger über die Flanke fahren: Eine deutlich hohl gebremste Flanke oder tiefe Riefen sind ein Warnzeichen.','Hat deine Felge eine Verschleißmarkierung (Rille oder Punkt), auf diese achten.'],
+    tools:['iso','lappen','handschuhe'],
+    note:'Ob die Brompton-Felgen eine Verschleißmarkierung haben, konnte ich nicht sicher herausfinden. Im Zweifel lass die Wandstärke beim Händler messen.'},
+   {t:'Bremse nachstellen',lv:1,iv:'wenn der Hebel zu weit durchgeht',
+    steps:['Einstellschraube am Bremshebel oder am Bremssattel in kleinen Schritten herausdrehen – das verkürzt den Leerweg.','Der Hebel soll deutlich vor dem Lenker fest werden. Im Ruhezustand dürfen die Beläge die Felge nicht berühren.','Rad drehen und horchen. Schleift ein Belag einseitig: mit der Zentrierschraube oben am Bremssattel ausgleichen.'],
+    tools:['inbus']},
+   {t:'Beläge wechseln',lv:2,iv:'wenn die Rillen abgefahren sind',
+    steps:['Passende Beläge für die Brompton-Bremse besorgen.','Belagschraube lösen und den alten Belag samt Unterlegscheiben abnehmen. Reihenfolge der Scheiben merken (Foto).','Neuen Belag mit den Scheiben in gleicher Reihenfolge einsetzen. Er soll der Rundung der Felge folgen und knapp über der Unterkante der Bremsflanke sitzen.','Belag mit leichter {{Vorspur}} ausrichten und festziehen – laut Brompton-Datenblatt mit 4 bis 6 Nm.','Leerweg mit der Einstellschraube anpassen, neue Beläge sind dicker.','Prüfen, dass die Beläge die Felge im Ruhezustand nicht berühren, dann vorsichtig {{Einbremsen}}.'],
+    tools:['inbus','drehmo','iso','lappen'],
+    note:'Der Belag darf auf keinen Fall den Reifen berühren – das schleift die Reifenflanke durch.'}
+  ],
+  shop:'Der Hebel geht bis zum Lenker durch, die Bremse lässt sich nicht gleichmäßig einstellen, die Felgenflanke ist stark abgenutzt – oder du bist unsicher. Bremsen sind sicherheitskritisch.'},
+
+ {id:'hebel',n:'Brems- und Schalthebel',lab:'Hebel',g:'Bremsen',a:[590,158],l:[430,190],z:[565,150],zw:180,
+  short:'Bremshebel und Schalthebel am Lenker',
+  what:'Am Lenker sitzen zwei Bremshebel und je nach Schaltung ein oder zwei Schalthebel.',
+  how:'Hebel ziehen = bremsen: Der Bremszug läuft zum Bremssattel. Wie viele Schalthebel du hast, hängt von der Schaltung ab – beim 6- und 12-Gang schaltet rechts die Nabe und links die Ritzel. Die Züge sind so verlegt, dass sie das Falten mitmachen. Dabei dürfen sie nicht geknickt oder eingeklemmt werden.',
+  wear:['Bremshebel lässt sich zu weit ziehen oder der {{Druckpunkt}} wandert','Schalten wird zäh oder ungenau','Griffe locker oder eingerissen','Züge geknickt oder an den Faltpunkten aufgescheuert'],
+  tasks:[
+   {t:'Bremshebel prüfen',lv:1,iv:'vor jeder Fahrt kurz',
+    steps:['Beide Bremshebel kräftig ziehen: Der Druckpunkt muss deutlich vor dem Lenker liegen.','Rad schieben und abwechselnd vorne und hinten bremsen – das Rad muss sicher stehen bleiben.'],
+    tools:[]},
+   {t:'Züge prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Rad einmal falten und entfalten und dabei auf die Züge achten: Sie dürfen nicht abknicken, klemmen oder sich verhaken.','Zughüllen dort ansehen, wo sie am Rahmen anliegen. Scheuerstellen abkleben oder die Hülle tauschen lassen.','Zugenden auf ausgefranste Litzen prüfen.'],
+    tools:['klebeband']},
+   {t:'Hebel und Griffe festziehen',lv:1,iv:'nach Bedarf',
+    steps:['Schellen von Hebeln und Griffen mit dem Inbus prüfen.','Hebel so ausrichten, dass du sie aus normaler Sitzposition bequem erreichst, dann mit dem Drehmomentschlüssel festziehen.'],
+    tools:['inbus','drehmo']}
+  ],
+  shop:'Zugtausch – beim Brompton müssen die Zuglängen zum Falten und zur Lenkerform passen. Es gibt dafür passende Zugsets.'},
+
+ /* -------- LAUFRÄDER -------- */
+ {id:'reifen',n:'Reifen',g:'Laufräder',a:[872,523],l:[930,430],z:[794,602],zw:440,
+  short:'16 Zoll: Grip, Komfort und Pannenschutz',
+  what:'Das C Line rollt auf kleinen 16-Zoll-Reifen (35-349). Serienmäßig sind laut Händlerangaben Schwalbe Marathon Racer montiert.',
+  how:'Kleine Räder brauchen vergleichsweise viel Druck, damit sie leicht rollen und der Schlauch nicht an Kanten eingeklemmt wird. Der Reifen sitzt mit seinem Wulst in der Felge, innen hält ein Schlauch die Luft. Beim Ventil findest du am Brompton beide Typen ({{Schrader und Presta}}) – schau nach, was bei dir verbaut ist.',
+  wear:['Abgefahrenes Profil oder flach gefahrene Mitte, vor allem hinten','Risse oder poröse Stellen an der Flanke','Schnitte, Splitter oder Glasscherben in der Lauffläche','Häufige Platten – oft zu wenig Druck'],
+  tasks:[
+   {t:'Luftdruck prüfen',lv:1,iv:'mindestens wöchentlich messen',
+    steps:['Ventiltyp prüfen – die Pumpe muss passen.','Auf den Zieldruck pumpen. Den zulässigen Bereich findest du auf der Reifenflanke.','Mit Manometer messen: Ein kleiner, prall gepumpter Reifen lässt sich mit dem Daumen kaum beurteilen.'],
+    tools:['pumpe'],
+    note:'Für den Schwalbe Marathon Racer in 35-349 nennen Händler 4,5 bis 7,5 bar. Was auf deinem Reifen steht, hat Vorrang. Leichtere Fahrer eher im unteren Bereich, schwerere und mit Gepäck eher weiter oben.'},
+   {t:'Reifen kontrollieren',lv:1,iv:'regelmäßig und nach Fahrten über Scherben oder Schotter',
+    steps:['Rad langsam drehen und die Lauffläche ansehen.','Steckende Splitter oder Steinchen vorsichtig herauspulen.','Flanken auf Risse und Beulen prüfen. Eine Beule heißt: Reifen tauschen.'],
+    tools:[]},
+   {t:'Schlauch flicken ohne Radausbau',lv:2,iv:'bei einer Panne – vor allem hinten',
+    steps:['Der Hinterradausbau ist beim Brompton aufwendig. Viele Pannen lassen sich flicken, ohne das Rad auszubauen.','Luft ganz ablassen und eine Reifenseite mit Reifenhebern über die Felge hebeln.','Schlauch an der Pannenstelle herausziehen. Loch suchen (aufpumpen, hören, fühlen) und flicken.','Reifen innen vorsichtig abtasten und die Ursache entfernen.','Schlauch zurücklegen und den Reifen wieder aufziehen. Bei 16 Zoll sitzt der Wulst stramm – die letzten Zentimeter mit beiden Daumen aufschieben, am Ventil enden.','Langsam aufpumpen und prüfen, dass der Reifen rundum gleichmäßig sitzt. Dann auf vollen Druck.'],
+    tools:['heber','pumpe','schlauch'],
+    note:'Lässt sich der Schlauch nicht flicken, muss das Rad raus – siehe Laufrad & Nabe.'}
+  ],
+  shop:'Selten nötig – höchstens, wenn das Hinterrad für einen Reifenwechsel raus muss und dir das zu fummelig ist.'},
+
+ {id:'laufrad',n:'Laufrad & Nabe',lab:'Laufrad',g:'Laufräder',a:[794,602],l:[790,782],z:[794,602],zw:400,
+  short:'Felge, Speichen, Naben und Achsmuttern',
+  what:'Trägt den Reifen und ist zugleich die Bremsfläche der Felgenbremse. Besteht aus Felge, Speichen und Nabe; hinten steckt je nach Modell die Nabenschaltung in der Nabe.',
+  how:'Die Speichen stehen unter Zug und halten die Felge rund. Befestigt sind die Räder mit {{Achsmutter}}n, nicht mit Schnellspanner oder Steckachse. Das Vorderrad ist schnell ausgebaut, das Hinterrad ist wegen Kettenspanner und gegebenenfalls Schaltkettchen deutlich fummeliger.',
+  wear:['Felge schlägt seitlich oder in der Höhe – bei Felgenbremsen spürst du das als pulsierendes Bremsen','Lockere oder gebrochene Speichen (klingen beim Anzupfen anders)','Spiel oder raues Laufen der Nabe','Felgenflanke durch Bremsen abgenutzt'],
+  tasks:[
+   {t:'Achsmuttern prüfen',lv:1,iv:'bei jeder Inspektion und nach jedem Radausbau',
+    steps:['Mit dem 15-mm-Schlüssel prüfen, dass beide Muttern vorn und hinten fest sind.','Die Sicherungsscheiben müssen richtig im Ausfallende sitzen.','Für das Hinterrad nennt ein Brompton-Datenblatt 18 Nm. Prüf den Wert für dein Modell.'],
+    tools:['maul','drehmo']},
+   {t:'Rundlauf und Speichen prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Rad anheben und drehen. Am Bremsbelag beobachten, ob die Felge seitlich oder in der Höhe schlägt.','Jeweils zwei benachbarte Speichen mit einer Hand zusammendrücken. Alle sollten sich ähnlich straff anfühlen.'],
+    tools:[]},
+   {t:'Nabenlager prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Rad eingebaut lassen, Felge oben greifen und seitlich hin- und herdrücken: Klacken bedeutet Lagerspiel.','Rad drehen und horchen: Es sollte lange und leise auslaufen, ohne Rauheit.'],
+    tools:[]},
+   {t:'Vorderrad aus- und einbauen',lv:1,iv:'bei einer Panne vorne',
+    steps:['Luft aus dem Reifen lassen, damit er zwischen den Bremsbelägen durchpasst.','Beide Achsmuttern ein paar Umdrehungen lösen, bis die Sicherungsscheiben frei sind, und das Rad nach unten herausnehmen.','Beim Einbau das Rad mittig ausrichten, die Sicherungsscheiben ins Ausfallende setzen und beide Muttern gleichmäßig festziehen.','Reifen aufpumpen und die Bremse testen, bevor du losfährst.'],
+    tools:['maul','drehmo']},
+   {t:'Hinterrad aus- und einbauen',lv:3,iv:'bei einer Panne, die sich im eingebauten Zustand nicht flicken lässt',
+    steps:['Vorher die Anleitung oder das Video von Brompton für deine Schaltung ansehen – die Schritte unterscheiden sich je nach Modell.','Mit Nabenschaltung: in den höchsten Gang schalten, Kontermutter am Zug lösen und das Schaltkettchen aus der Achse schrauben. Vorsichtig, es ist empfindlich.','Luft ablassen, damit der Reifen zwischen den Bremsbelägen durchpasst.','Mutter des Kettenspanners lösen und den Kettenspanner abnehmen bzw. die Kette entspannen.','Achsmuttern lösen, bis die Sicherungsscheiben frei sind, und das Rad herausnehmen.','Einbau in umgekehrter Reihenfolge: Kette ums Ritzel legen, Achse in beiden Ausfallenden ganz einsetzen, Muttern festziehen (laut Datenblatt 18 Nm), Schaltkettchen eindrehen und die Nabenschaltung neu einstellen.'],
+    tools:['maul','drehmo','heber','pumpe'],
+    note:'Das ist die fummeligste Arbeit am Brompton. Die Schritte fassen ein Brompton-Datenblatt für die 3- und 6-Gang-Nabe zusammen – beim 2-, 4- und 12-Gang weichen sie ab.'},
+   {t:'Kleine Seitenschläge zentrieren',lv:3,iv:'bei Bedarf',
+    steps:['Stelle mit dem Schlag markieren.','Speichennippel in Viertelumdrehungen anziehen oder lösen: Speichen zur einen Nabenseite ziehen die Felge zu dieser Seite.','Immer nur wenig verändern und sofort prüfen.'],
+    tools:['speichen','zentrier'],
+    note:'Wer sich unsicher ist, macht es eher schlimmer. Für den Anfang lieber der Werkstatt zuschauen.'}
+  ],
+  shop:'Gebrochene Speiche, deutlicher Schlag, Lagerspiel, Probleme mit der Nabenschaltung – und das Hinterrad, wenn dir der Ausbau zu fummelig ist.'},
+
+ /* -------- COCKPIT & LENKUNG -------- */
+ {id:'lenker',n:'Lenker & Vorbau',lab:'Lenker',g:'Cockpit & Lenkung',a:[590,126],l:[470,80],z:[620,250],zw:360,
+  short:'Hoher Klappvorbau mit Lenker und Griffen',
+  what:'Der lange Vorbau trägt den Lenker und lässt sich zum Falten über das Vorbau-{{Faltgelenk}} umklappen. Je nach Ausstattung hat das Brompton einen niedrigen, mittelhohen oder hohen Lenker.',
+  how:'Der Vorbau ist mit der Gabel verbunden und dreht mit ihr. Oben klemmt der Lenker, daran sitzen Griffe, Bremshebel und Schalthebel. Beim Falten klappt der Vorbau nach unten an die Seite des Rads.',
+  wear:['Lenker oder Vorbau lässt sich gegen das Vorderrad verdrehen','Griffe drehen sich oder sind abgenutzt','Knacken oder Spiel im Vorbau','Risse an den Klemmungen'],
+  tasks:[
+   {t:'Sitz prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Vorbaugelenk fest zudrehen (siehe Faltgelenke).','Vorderrad zwischen die Knie klemmen und versuchen, den Lenker zu verdrehen. Er darf sich mit normaler Kraft nicht bewegen.','Lenker in seiner Klemmung nach vorn und hinten drücken: Er darf sich nicht verdrehen.','Griffe auf festen Sitz prüfen.'],
+    tools:[]},
+   {t:'Klemmschrauben prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Lenkerklemmung und Hebelschellen mit dem Drehmomentschlüssel auf die Werte aus der Anleitung prüfen.','Schrauben einer Klemmung immer abwechselnd in kleinen Schritten anziehen.'],
+    tools:['inbus','drehmo']}
+  ],
+  shop:'Risse am Lenker oder Vorbau, Spiel im Vorbau, das nicht vom Gelenk kommt, oder nach einem Sturz.'},
+
+ {id:'steuersatz',n:'Steuersatz',g:'Cockpit & Lenkung',a:[690,374],l:[850,250],z:[700,405],zw:220,
+  short:'Lager, in denen Gabel und Vorbau drehen',
+  what:'Die zwei Lager oben und unten im Steuerrohr, in denen sich Gabel und Lenker drehen.',
+  how:'Das Brompton hat einen {{Gewindesteuersatz}}: Eine Kontermutter oben auf dem Gabelschaft hält das Lagerspiel. Das ist robust, zum Einstellen braucht es aber zwei flache Schlüssel.',
+  wear:['Klacken oder Rucken beim Bremsen','Lenkung rastet in Geradeausstellung ein','Raues oder schwergängiges Lenken'],
+  tasks:[
+   {t:'Spiel prüfen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Vorbaugelenk fest zudrehen – Spiel im Gelenk fühlt sich ähnlich an.','Vorderradbremse ziehen und festhalten.','Andere Hand um das untere Ende des Steuerrohrs legen, dort wo die Gabel herauskommt.','Rad vor und zurück schieben: Fühlbares Klacken heißt, es ist Spiel da.','Vorderrad anheben und den Lenker langsam drehen: Er sollte gleichmäßig laufen, ohne einzurasten.'],
+    tools:[]},
+   {t:'Spiel einstellen',lv:3,iv:'wenn Spiel spürbar ist',
+    steps:['Beim Gewindesteuersatz wird das Spiel über die obere Lagerschale eingestellt und mit der Kontermutter gesichert.','Dafür braucht es zwei flache Schlüssel: Einer hält die Lagerschale, der andere zieht die Kontermutter dagegen fest.','Die Lenkung muss danach ohne Spiel und ohne Schwergängigkeit drehen.'],
+    tools:['steuersatzschl'],
+    note:'Eine aktuelle Brompton-Anleitung dazu habe ich nicht gefunden, nur ein älteres Händler-Datenblatt. Ob vorher der Vorbau abmuss, hängt vom Modell ab. Ohne Anleitung: Werkstatt.'}
+  ],
+  shop:'Spiel, rastende oder raue Lenkung – Einstellen und Lagertausch am besten beim Brompton-Händler.'},
+
+ {id:'gabel',n:'Gabel',g:'Cockpit & Lenkung',a:[734,506],l:[890,340],z:[750,520],zw:300,
+  short:'Hält das Vorderrad',
+  what:'Hält das Vorderrad und überträgt deine Lenkbewegungen. Beim C Line aus Stahl und ungefedert.',
+  how:'Der Gabelschaft läuft durch das Steuerrohr. Unten wird das Vorderrad mit Achsmuttern befestigt, oben am Gabelkopf sitzt die Vorderradbremse.',
+  wear:['Verbogene Gabel nach einem Sturz oder Anstoßen','Rost an Ausfallenden oder Gabelkopf','Risse am Gabelkopf'],
+  tasks:[
+   {t:'Sichtprüfung',lv:1,iv:'bei jeder Inspektion und nach jedem Sturz',
+    steps:['Gabel sauber machen und genau ansehen, besonders an den Ausfallenden und am Gabelkopf.','Von vorn schauen: Stehen beide Gabelholme gerade und gleich?','Lackschäden ausbessern, damit der Stahl nicht rostet.'],
+    tools:['lappen']}
+  ],
+  shop:'Jeder Verdacht auf eine verbogene Gabel – nicht richten, sondern tauschen lassen.'},
+
+ /* -------- RAHMEN & SITZ -------- */
+ {id:'rahmen',n:'Rahmen',g:'Rahmen & Sitz',a:[460,443],l:[455,360],z:[530,450],zw:640,
+  short:'Hauptrahmen mit Faltgelenk',
+  what:'Das Grundgerüst aus Stahl: ein großes Hauptrohr mit Faltgelenk, das Sitzrohr und das Steuerrohr. Vorn am Steuerrohr sitzt meist der Halter für Brompton-Taschen.',
+  how:'Beim Falten klappt der Rahmen am Hauptgelenk in der Mitte, der {{Hinterbau}} schwenkt unter den Rahmen. Stahl ist robust und gut reparierbar, kann aber an Lackschäden rosten.',
+  wear:['Risse, besonders an Schweißnähten, an den Gelenken und am Steuerrohr','Rost an Lackschäden','Verbogenes Hauptrohr nach einem Sturz'],
+  tasks:[
+   {t:'Reinigen und Sichtprüfung',lv:1,iv:'alle paar Wochen',
+    steps:['Mit Wasser und Fahrradreiniger abwaschen. Keinen Hochdruckreiniger direkt auf Lager und Nabe richten.','Beim Trocknen Rohr für Rohr ansehen, besonders an den Übergängen und rund um die Gelenke.','Lackschäden mit Lackstift abdecken, damit der Stahl nicht rostet.','Stellen, an denen beim Falten Teile aneinander scheuern, mit Schutzfolie abkleben.'],
+    tools:['reiniger','lappen']},
+   {t:'Falten testen',lv:1,iv:'bei jeder Inspektion',
+    steps:['Rad komplett falten und wieder entfalten. Alles muss sich ohne Gewalt bewegen lassen.','Gefaltet prüfen, ob das Paket zusammenhält und nichts aneinander reibt.','Entfaltet alle Gelenke wieder fest zudrehen.'],
+    tools:[]}
+  ],
+  shop:'Risse, Verformungen oder Rost, der sich ins Rohr frisst.'},
+
+ {id:'sattel',n:'Sattel',g:'Rahmen & Sitz',a:[290,186],l:[170,110],z:[290,195],zw:240,
+  short:'Trägt dein Gewicht',
+  what:'Trägt einen großen Teil deines Gewichts. Die richtige Position ist wichtig für Komfort und Kraftübertragung.',
+  how:'Das Sattelgestell sitzt in der Klemmung oben auf der Sattelstütze. Dort stellt man Neigung und Position vor/zurück ein, die Höhe über die Stütze.',
+  wear:['Bezug eingerissen','Gestell verbogen','Knarzen aus der Klemmung'],
+  tasks:[
+   {t:'Position einstellen',lv:1,iv:'nach Bedarf',
+    steps:['Aktuelle Position vorher markieren oder fotografieren.','Klemmschraube unter dem Sattel lösen und Neigung oder Versatz in kleinen Schritten ändern.','Mit dem Drehmomentschlüssel auf den Herstellerwert anziehen.','Probefahrt. Pro Fahrt nur eine Sache ändern, sonst weißt du nicht, was gewirkt hat.'],
+    tools:['inbus','drehmo','klebeband']}
+  ],
+  shop:'Dauerhafte Sitzbeschwerden – dann eher ein Bikefitting als Schrauberei.'},
+
+ {id:'stuetze',n:'Sattelstütze',g:'Rahmen & Sitz',a:[319,288],l:[150,235],z:[318,280],zw:280,
+  short:'Lange Stütze, beim Falten ganz versenkt',
+  what:'Hält den Sattel und bestimmt die Sitzhöhe. Beim Falten wird sie ganz nach unten geschoben und hält so das gefaltete Rad zusammen.',
+  how:'Die Stütze gleitet in einer {{Sattelstützenführung}} aus Kunststoff und wird oben mit einem Schnellspanner geklemmt. Anders als bei den meisten Rädern wird sie nicht gefettet: Brompton schreibt vor, sie sauber und frei von Fett und Öl zu halten. Die Mindesteinstecktiefe ist auf der Stütze markiert.',
+  wear:['Stütze rutscht beim Fahren langsam ein','Stütze lässt sich nur schwer verstellen','Knarzen beim Sitzen','Markierung der Mindesteinstecktiefe ist sichtbar'],
+  tasks:[
+   {t:'Klemmung und Sitzhöhe prüfen',lv:1,iv:'vor jeder Fahrt',
+    steps:['Der Schnellspanner muss geschlossen sein und deutlich spürbar klemmen.','Die Markierung der Mindesteinstecktiefe darf nicht zu sehen sein.','Sitzhöhe mit einem Streifen Klebeband an der Stütze markieren – dann findest du sie nach dem Falten sofort wieder.'],
+    tools:['klebeband']},
+   {t:'Stütze reinigen',lv:1,iv:'bei Rutschen oder Knarzen',
+    steps:['Stütze ganz hochziehen und mit einem Tuch und etwas Isopropanol fettfrei wischen.','Auch die Führung oben im Sitzrohr sauber wischen.','Trocknen lassen und ohne Fett wieder einsetzen.'],
+    tools:['lappen','iso'],
+    note:'Kein Fett und keine Montagepaste: Fett zieht Dreck an und lässt die Stütze rutschen.'},
+   {t:'Klemmkraft nachstellen',lv:2,iv:'wenn die Stütze trotz sauberer Oberfläche rutscht',
+    steps:['Schnellspanner öffnen und die Mutter auf der Gegenseite höchstens eine Viertelumdrehung anziehen. Spanner schließen und testen.','Laut Brompton nicht mehr als ein- bis zweimal nachstellen – zu viel Klemmkraft kann den Rahmen dauerhaft beschädigen.','Sind vier oder mehr Gewindegänge an der Klemmschraube zu sehen, ist laut Brompton die Sattelstützenführung verschlissen und muss getauscht werden.'],
+    tools:['maul','inbus']}
+  ],
+  shop:'Die Stütze rutscht trotz Reinigung und Nachstellen oder lässt sich kaum bewegen: Dann ist die Sattelstützenführung fällig – Tausch beim Händler.'}
+];
+
+const BROMPTON_INSP = [
+ {t:'Vorbereitung',parts:['rahmen'],tools:['reiniger','lappen','staender','handschuhe'],
+  checks:['Rad gereinigt – Schäden sieht man nur an einem sauberen Rad','Gutes Licht und Platz','Rad entfaltet und sicher angelehnt oder im Montageständer','Werkzeug bereitgelegt']},
+ {t:'Falten und Entfalten',parts:['rahmen','scharnier','hinterbau'],tools:[],
+  checks:['Rad lässt sich ohne Gewalt falten und entfalten','Gefaltet hält das Paket zusammen','Züge werden beim Falten nicht geknickt oder eingeklemmt','Klapppedal klappt und rastet sauber']},
+ {t:'Faltgelenke',parts:['scharnier'],tools:['oel','lappen'],
+  checks:['Beide Klemmhebel lassen sich fest zudrehen','Kein Spiel im Hauptgelenk und im Vorbaugelenk','Klemmplatten berühren die Gelenkhälften nicht','Gelenkbolzen und Hebelgewinde geölt, Überschuss abgewischt']},
+ {t:'Rahmen, Hinterbau und Gabel',parts:['rahmen','hinterbau','gabel'],tools:[],
+  checks:['Keine Risse, Dellen oder Roststellen','Kein seitliches Spiel im Drehgelenk des Hinterbaus','Gabel gerade, Ausfallenden unbeschädigt','Taschenhalter, Schutzbleche und Rollen fest']},
+ {t:'Federelement',parts:['federelement'],tools:[],
+  checks:['Gummi ohne Risse oder Ausbrüche','Befestigung fest','Verriegelung des Hinterbaus funktioniert wie gewünscht']},
+ {t:'Steuersatz',parts:['steuersatz'],tools:[],
+  checks:['Kein Spiel bei gezogener Vorderradbremse','Lenkung dreht frei und rastet nicht ein']},
+ {t:'Lenker, Vorbau und Hebel',parts:['lenker','hebel'],tools:['inbus','drehmo'],
+  checks:['Lenker lässt sich nicht gegen das Vorderrad verdrehen','Griffe und Hebel sitzen fest','Züge ohne Knicke oder Scheuerstellen']},
+ {t:'Sattel und Sattelstütze',parts:['sattel','stuetze'],tools:['lappen','klebeband'],
+  checks:['Sattel sitzt fest und gerade','Stütze rutscht nicht ein, Mindesteinstecktiefe eingehalten','Stütze sauber und fettfrei','Sitzhöhe markiert']},
+ {t:'Laufräder',parts:['laufrad'],tools:['maul','drehmo'],
+  checks:['Achsmuttern vorn und hinten fest','Kein sichtbarer Seiten- oder Höhenschlag','Speichen gleichmäßig straff','Kein Nabenspiel, Räder laufen leise aus']},
+ {t:'Reifen',parts:['reifen'],tools:['pumpe'],
+  checks:['Profil ausreichend, keine Risse oder Beulen','Fremdkörper entfernt','Ventil sitzt gerade','Luftdruck nach Reifenflanke eingestellt']},
+ {t:'Bremsen',parts:['bremse','hebel'],tools:['iso','lappen','inbus'],
+  checks:['Rillen in den Belägen noch gut sichtbar','Beläge treffen nur die Felge, nie den Reifen','Bremsflanken sauber und nicht hohl gebremst','Keine Bremse schleift','Druckpunkt fest, Hebel geht nicht bis zum Lenker']},
+ {t:'Kette',parts:['kette'],tools:['kettenlehre'],
+  checks:['Verschleiß gemessen und unter der Grenze','Keine steifen Glieder','Kettenschloss sitzt richtig']},
+ {t:'Kettenspanner und Schaltung',parts:['spanner','nabe'],tools:['lappen'],
+  checks:['Röllchen sauber und ohne Spiel','Spannarm federt von selbst zurück','Alle Gänge schalten sauber','Nur 3-, 6- und 12-Gang: Stufe am Schaltkettchen bündig mit dem Achsende'],
+  note:'Trifft ein Punkt auf deine Schaltung nicht zu, hake ihn einfach ab.'},
+ {t:'Kurbel, Tretlager und Pedale',parts:['kurbel','tretlager','pedal'],tools:['inbus','pedalschl'],
+  checks:['Kein Spiel an der Kurbel','Tretlager läuft ruhig','Pedale fest, ohne Spiel','Klapppedal rastet in beiden Stellungen ein']},
+ {t:'Schrauben auf Drehmoment',parts:['lenker','sattel','bremse','laufrad','kurbel'],tools:['drehmo','inbus','maul'],
+  checks:['Lenker- und Hebelklemmungen','Sattelklemmung','Bremssättel und Belagschrauben','Achsmuttern','Kurbel und Kettenblatt','Taschenhalter und Schutzbleche'],
+  note:'Die Werte stehen meist auf dem Bauteil oder in der Herstelleranleitung. Ich nenne hier bewusst keine Zahlen, weil sie je nach Bauteil und Baujahr abweichen.'},
+ {t:'Reinigen und schmieren',parts:['kette','spanner','nabe','scharnier'],tools:['reiniger','lappen','oel','iso'],
+  checks:['Antrieb gereinigt','Kette geölt und außen abgewischt','Gelenke und Schaltkettchen geölt, Überschuss abgewischt','Bremsflanken fettfrei']},
+ {t:'Probefahrt',parts:['bremse','spanner','nabe'],tools:[],
+  checks:['Bremsen erst langsam, dann kräftig getestet','Alle Gänge unter Last geschaltet','Keine ungewohnten Geräusche, nichts klappert','Lenkung frei und gerade']}
+];
+
+/* ======================= RÄDER ======================= */
+const ICON={
+  gravel:`<svg viewBox="0 0 120 76" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="25" cy="52" r="20"/><circle cx="95" cy="52" r="20"/><path d="M25 52 52 54 44 26M52 54 83 25M25 52 45 28M45 26 82 22M83 21 95 52"/><path d="M38 22h13M82 22c6-3 11-1 12 4s-2 8-6 8"/></svg>`,
+  brompton:`<svg viewBox="0 0 120 76" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="27" cy="61" r="13"/><circle cx="93" cy="61" r="13"/><path d="M48 46 84 40M57 60 46 30 42 16M34 15h14M56 58 27 61 45 50 56 58M85 38 93 61M84 36 75 8l-8 2"/><circle cx="57" cy="60" r="7"/></svg>`
+};
+const BIKES={
+ gravel:{id:'gravel',n:'Gravelbike',sub:'für Gravel- und Rennräder',
+  desc:'Rennlenker, Scheibenbremsen und Kettenschaltung. Passt auch für die meisten Rennräder.',
+  facts:['Rennlenker','Scheibenbremse','Kettenschaltung'],
+  aria:'Schematische Seitenansicht eines Gravelbikes mit tippbaren Bauteilen',
+  parts:GRAVEL_PARTS,insp:GRAVEL_INSP,groups:['Antrieb','Bremsen','Laufräder','Cockpit & Lenkung','Rahmen & Sitz'],
+  tools:['inbus','torx','drehmo','pumpe','heber','schlauch','kettenlehre','lappen','reiniger','oel','fett','iso','handschuhe','kreuz','klebeband',
+   'messschieber','kettennieter','schlosszange','peitsche','abzieher','pedalschl','speichen','zugschneider','kolben','carbon','staender',
+   'innenlager','entlueft','schaltauge','zentrier'],
+  gloss:Object.keys(GLOSS),ck:'checks',
+  spokes:[[215,530,'spokesR',24,16,160],[785,530,'spokesF',24,16,160]],
+  disclaimer:'Diese Anleitungen sind allgemein für Gravel- und Rennräder geschrieben und ersetzen nicht die Anleitung deines Herstellers. Drehmomente, Verschleißgrenzen und Medien stehen dort oder auf dem Bauteil. Bei Bremsen, Lenkung und Laufrädern gilt im Zweifel: Werkstatt.'},
+ brompton:{id:'brompton',n:'Brompton C Line',sub:'für das Brompton C Line',
+  desc:'Faltrad mit 16-Zoll-Laufrädern, Felgenbremsen und Naben- oder Kettenschaltung. Für alle Schaltungen von 2 bis 12 Gängen.',
+  facts:['Faltrad','16 Zoll','Felgenbremse','2 bis 12 Gänge'],
+  aria:'Schematische Seitenansicht eines Brompton-Faltrads mit tippbaren Bauteilen',
+  parts:BROMPTON_PARTS,insp:BROMPTON_INSP,groups:['Faltmechanik','Antrieb','Bremsen','Laufräder','Cockpit & Lenkung','Rahmen & Sitz'],
+  tools:['inbus','maul','drehmo','pumpe','heber','schlauch','kettenlehre','lappen','reiniger','oel','fett','iso','handschuhe','klebeband',
+   'kettennieter','schlosszange','pedalschl','speichen','staender','innenlager','steuersatzschl','zentrier'],
+  td:{
+   drehmo:'Zieht Schrauben genau auf den Herstellerwert an, etwa Achsmuttern, Lenkerklemmung und Bremsbeläge. Für Achsmuttern braucht es einen Schlüssel mit etwas größerem Bereich.',
+   pumpe:'Pumpt schnell und zeigt den Druck an. Am Brompton sind oft Autoventile (Schrader) verbaut, je nach Schlauch auch Presta – die Pumpe sollte beides können. Kleine Reifen brauchen viel Druck, ein Manometer ist hier besonders wichtig.',
+   heber:'Zum Abnehmen des Reifens. Kunststoff schont die Felge. Bei 16-Zoll-Reifen sitzt der Wulst stramm – zwei bis drei Heber helfen.',
+   kettenlehre:'Zeigt in Sekunden, ob die Kette gelängt ist. Günstig und schont Ritzel und Kettenblatt.',
+   lappen:'Für Kette, Kettenspanner und Rahmen. Eine alte Zahnbürste ist für die Röllchen des Kettenspanners ideal.',
+   reiniger:'Rahmenreiniger für den Rahmen, Entfetter für den Antrieb. Entfetter nicht auf Bremsbeläge und Felgenflanken.',
+   klebeband:'Zum Markieren der Sitzhöhe an der Sattelstütze und zum Abkleben von Scheuerstellen an Zügen.',
+   schlauch:'Die Größe steht auf der Reifenflanke, beim C Line 16 Zoll (35-349, auch „16 x 1 3/8"). Beim Ventil auf den Typ deines Rads achten.',
+   oel:'Für die Kette – und laut Brompton auch ein paar Tropfen für Gelenkbolzen, Klemmhebelgewinde und Schaltkettchen. Überschuss immer abwischen.',
+   fett:'Gegen Festbacken an Gewinden, etwa an den Pedalen. Nicht an die Sattelstütze – die bleibt beim Brompton fettfrei.',
+   iso:'Reinigt Bremsflanken und Beläge rückstandsfrei und entfettet die Sattelstütze.',
+   kettennieter:'Zum Kürzen oder Trennen einer Kette. Muss zur Kettenbreite passen – beim Brompton je nach Modell 1/8 oder 3/32 Zoll.',
+   staender:'Macht die Arbeit angenehmer, ist aber kein Muss. Vieles geht auch, wenn das Rad sicher angelehnt steht.',
+   innenlager:'Systemspezifisch. Für den Kurbelausbau braucht es zusätzlich einen passenden Kurbelabzieher – welcher, hängt vom Baujahr ab.'},
+  gloss:['Druckpunkt','Einbremsen','Kettenlängung','Newtonmeter','Zugspannung','Anschlagschrauben',...Object.keys(GLOSS_B)],ck:'checks-brompton',
+  spokes:[[200,602,'bspokesR',28,22,99],[794,602,'bspokesF',28,10,99]],
+  intro:{t:'Welche Schaltung hat dein Brompton?',
+   p:'Das C Line gibt es mit verschiedenen Schaltungen. Am schnellsten erkennst du sie hinten am Rad – zähl die Ritzel und schau, ob rechts aus der Achse ein {{Schaltkettchen}} kommt:',
+   li:['1 Ritzel und Schaltkettchen: 3-Gang mit Nabenschaltung','2 Ritzel ohne Schaltkettchen: 2-Gang','2 Ritzel und Schaltkettchen: 6-Gang (bis Modelljahr 2024)','4 Ritzel ohne Schaltkettchen: 4-Gang (ab Modelljahr 2026)','4 Ritzel und Schaltkettchen: 12-Gang (ab Modelljahr 2025)'],
+   foot:'Bei den Anleitungen steht jeweils dabei, für welche Schaltung sie gelten. Die Modelljahre stammen aus Händler- und Presseberichten.'},
+  disclaimer:'Diese Anleitungen sind für das Brompton C Line geschrieben und beruhen auf Brompton-Datenblättern, Händlerangaben und allgemeinem Werkstattwissen. Sie ersetzen nicht die Anleitung von Brompton – Drehmomente und Ersatzteile unterscheiden sich je nach Baujahr. Vieles gilt auch für ältere Bromptons. Bei Faltgelenken, Bremsen, Lenkung und Laufrädern gilt im Zweifel: Brompton-Händler.'}
+};
+
 /* ======================= STATE ======================= */
 const store={
   get(k,d){try{const v=localStorage.getItem('fw:'+k);return v?JSON.parse(v):d}catch(e){return d}},
   set(k,v){try{localStorage.setItem('fw:'+k,JSON.stringify(v))}catch(e){}}
 };
 let owned=new Set(store.get('owned',[]));
-let checks=store.get('checks',{});
+/* Das gewählte Rad bestimmt Bauteile, Inspektion, Werkzeug und Begriffe. Werkzeug gilt für alle Räder. */
+let bike=null, PARTS=[], INSP=[], GROUPS=[], byId={};
+let checks={};
 let dtab=0;
 const openSteps=new Set();
 const BASE=[0,0,1000,810];
 let vb=BASE.slice();
 let current=null;
+let labelsDirty=true;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const byId=Object.fromEntries(PARTS.map(p=>[p.id,p]));
 const $=s=>document.querySelector(s);
 const svg=$('#bike'), stage=$('#stage'), panel=$('#panel');
 const NS='http://www.w3.org/2000/svg';
@@ -755,7 +1362,7 @@ const NS='http://www.w3.org/2000/svg';
 /* ======================= HELPERS ======================= */
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const fmt=s=>esc(s).replace(/\{\{([^}]+)\}\}/g,(m,t)=>{
-  const key=Object.keys(GLOSS).find(k=>t.startsWith(k))||t;
+  const key=Object.keys(ALLGLOSS).find(k=>t.startsWith(k))||t;
   return `<button class="term" data-term="${esc(key)}">${t}</button>`;
 });
 const plain=s=>s.replace(/\{\{([^}]+)\}\}/g,'$1');
@@ -763,6 +1370,7 @@ const LVN=['','Leicht','Mittel','Anspruchsvoll'];
 const lv=n=>`<span class="lv lv${n}"><span><i></i><i></i><i></i></span>${LVN[n]}</span>`;
 const chip=id=>`<button class="chip${owned.has(id)?' have':''}" data-tool="${id}">${esc(TOOLS[id].n)}</button>`;
 const toolsOf=p=>[...new Set(p.tasks.flatMap(t=>t.tools))];
+const td=id=>(bike&&bike.td&&bike.td[id])||TOOLS[id].d;
 
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),1800)}
 function openSheet(html){const s=$('#sheet');s.innerHTML=html;s.hidden=false;$('#scrim').hidden=false;const f=s.querySelector('button,textarea');if(f)f.focus()}
@@ -779,19 +1387,21 @@ async function copyMd(text,filename){
 }
 
 /* ======================= SVG ======================= */
-function spokes(cx,cy,g){
-  for(let i=0;i<24;i++){
-    const a=i*Math.PI/12, off=(i%2?1:-1)*0.42;
+function spokes(cx,cy,g,n,r0,r1){
+  for(let i=0;i<n;i++){
+    const a=i*2*Math.PI/n, off=(i%2?1:-1)*0.42;
     const l=document.createElementNS(NS,'line');
-    l.setAttribute('x1',cx+16*Math.cos(a+off));l.setAttribute('y1',cy+16*Math.sin(a+off));
-    l.setAttribute('x2',cx+160*Math.cos(a));l.setAttribute('y2',cy+160*Math.sin(a));
+    l.setAttribute('x1',cx+r0*Math.cos(a+off));l.setAttribute('y1',cy+r0*Math.sin(a+off));
+    l.setAttribute('x2',cx+r1*Math.cos(a));l.setAttribute('y2',cy+r1*Math.sin(a));
     l.setAttribute('class','spk');g.appendChild(l);
   }
 }
-spokes(215,530,$('#spokesR'));spokes(785,530,$('#spokesF'));
+Object.values(BIKES).forEach(b=>b.spokes.forEach(([cx,cy,id,n,r0,r1])=>spokes(cx,cy,document.getElementById(id),n,r0,r1)));
 
 const L=$('#labels');
-PARTS.forEach(p=>{
+function buildLabels(){
+ L.replaceChildren();labelsDirty=true;
+ PARTS.forEach(p=>{
   const line=document.createElementNS(NS,'line');
   line.setAttribute('class','lead');line.dataset.for=p.id;line.setAttribute('x1',p.l[0]);line.setAttribute('y1',p.l[1]);
   line.setAttribute('x2',p.a[0]);line.setAttribute('y2',p.a[1]);L.appendChild(line);
@@ -804,12 +1414,17 @@ PARTS.forEach(p=>{
   const t=document.createElementNS(NS,'text');t.setAttribute('x',p.l[0]);t.setAttribute('y',p.l[1]);
   t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','central');t.textContent=p.lab||p.n;
   g.appendChild(r);g.appendChild(t);L.appendChild(g);
-});
+ });
+ if(!$('#v-rad').hidden)sizeLabels();
+}
+/* Misst die Beschriftungen – geht nur, solange die Rad-Ansicht sichtbar ist. */
 function sizeLabels(){
+  let ok=false;
   L.querySelectorAll('.lbl').forEach(g=>{
     const t=g.querySelector('text'),r=g.querySelector('rect');let b;
     try{b=t.getBBox()}catch(e){return}
     if(!b.width)return;
+    ok=true;
     const p=byId[g.dataset.part];
     const x0=p.l[0]-b.width/2;let sh=0;
     if(x0-16<4)sh=4-(x0-16); if(x0+b.width+16>996)sh=996-(x0+b.width+16);t.setAttribute('x',p.l[0]+sh);
@@ -817,9 +1432,9 @@ function sizeLabels(){
     b=t.getBBox();
     r.setAttribute('x',b.x-16);r.setAttribute('y',b.y-6);r.setAttribute('width',b.width+32);r.setAttribute('height',b.height+12);
   });
+  if(ok)labelsDirty=false;
 }
-sizeLabels();
-if(document.fonts&&document.fonts.ready)document.fonts.ready.then(sizeLabels);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{labelsDirty=true;if(!$('#v-rad').hidden)sizeLabels()});
 
 function setVB(a){vb=a;svg.setAttribute('viewBox',a.map(n=>n.toFixed(1)).join(' '))}
 function animVB(to){
@@ -850,10 +1465,13 @@ function highlight(id){
 }
 
 /* ======================= RAD-VIEWS ======================= */
-const GROUPS=['Antrieb','Bremsen','Laufräder','Cockpit & Lenkung','Rahmen & Sitz'];
+function renderIntro(i){
+  return `<details class="task"><summary><span class="tt">${esc(i.t)}</span></summary><div class="tbody tabbody"><p>${fmt(i.p)}</p>
+  <ul>${i.li.map(x=>`<li>${fmt(x)}</li>`).join('')}</ul><div class="note">${fmt(i.foot)}</div></div></details>`;
+}
 function renderOverview(){
-  panel.innerHTML=`<div class="groups">${GROUPS.map(g=>`<h2>${esc(g)}</h2><ul class="rows">${PARTS.filter(p=>p.g===g).map(p=>`<li><button data-go="#/rad/${p.id}"><span class="nm">${esc(p.n)}</span><span class="ds">${esc(p.short)}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></li>`).join('')}</ul>`).join('')}</div>
-  <p class="disclaimer">Diese Anleitungen sind allgemein für Gravel- und Rennräder geschrieben und ersetzen nicht die Anleitung deines Herstellers. Drehmomente, Verschleißgrenzen und Medien stehen dort oder auf dem Bauteil. Bei Bremsen, Lenkung und Laufrädern gilt im Zweifel: Werkstatt.</p>`;
+  panel.innerHTML=`<div class="groups">${bike.intro?renderIntro(bike.intro):''}${GROUPS.map(g=>`<h2>${esc(g)}</h2><ul class="rows">${PARTS.filter(p=>p.g===g).map(p=>`<li><button data-go="#/rad/${p.id}"><span class="nm">${esc(p.n)}</span><span class="ds">${esc(p.short)}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></li>`).join('')}</ul>`).join('')}</div>
+  <p class="disclaimer">${esc(bike.disclaimer)}</p>`;
 }
 function tabFunktion(p){
   return `<p class="lead-p">${fmt(p.what)}</p><h3>So funktioniert es</h3><p>${fmt(p.how)}</p>
@@ -870,7 +1488,7 @@ function tabWerkzeug(p){
   const ids=toolsOf(p);
   if(!ids.length)return '<p>Für die Kontrollen an diesem Bauteil brauchst du kein Werkzeug.</p>';
   return `<p>Alles, was für die Arbeiten an diesem Bauteil gebraucht wird. Hake ab, was du schon hast – das gilt auch in der Werkzeugliste.</p>
-  <ul class="cl">${ids.map(id=>`<li><input type="checkbox" id="o-${id}" data-own="${id}"${owned.has(id)?' checked':''}><label for="o-${id}">${esc(TOOLS[id].n)}<small>${esc(KIND[TOOLS[id].k])} – ${esc(TOOLS[id].d)}</small></label></li>`).join('')}</ul>`;
+  <ul class="cl">${ids.map(id=>`<li><input type="checkbox" id="o-${id}" data-own="${id}"${owned.has(id)?' checked':''}><label for="o-${id}">${esc(TOOLS[id].n)}<small>${esc(KIND[TOOLS[id].k])} – ${esc(td(id))}</small></label></li>`).join('')}</ul>`;
 }
 function renderDetail(p){
   const i=PARTS.indexOf(p),prev=PARTS[(i-1+PARTS.length)%PARTS.length],next=PARTS[(i+1)%PARTS.length];
@@ -900,48 +1518,76 @@ function renderInsp(){
 /* ======================= WERKZEUG ======================= */
 function usedBy(id){return PARTS.filter(p=>toolsOf(p).includes(id))}
 function renderTools(){
-  const basis=Object.keys(TOOLS).filter(k=>TOOLS[k].k==='basis');const have=basis.filter(k=>owned.has(k)).length;
+  const basis=bike.tools.filter(k=>TOOLS[k].k==='basis');const have=basis.filter(k=>owned.has(k)).length;
   const desc={basis:'Damit kommst du durch die Inspektion und die meisten Leicht-Arbeiten.',erweitert:'Für Ketten-, Kassetten- und Belagwechsel und ähnliche Mittel-Arbeiten.',werkstatt:'Teuer oder selten gebraucht – lohnt sich meist erst, wenn du viel selbst machst.'};
   $('#v-tools').innerHTML=`<div class="vhead"><h2>Werkzeug</h2><p>Hake ab, was du schon hast. Fehlende Teile kannst du als Einkaufsliste kopieren.</p>
   <div class="prog"><div style="width:${have/basis.length*100}%"></div></div><span class="progt">${have} von ${basis.length} Teilen der Grundausstattung vorhanden</span></div>
-  <div class="panel">${Object.keys(KIND).map(k=>`<div class="tsec"><h3>${KIND[k]}</h3><p>${desc[k]}</p><ul class="cl">${Object.keys(TOOLS).filter(id=>TOOLS[id].k===k).map(id=>{const u=usedBy(id);
-   return `<li><input type="checkbox" id="t-${id}" data-own="${id}"${owned.has(id)?' checked':''}><label for="t-${id}">${esc(TOOLS[id].n)}<small>${esc(TOOLS[id].d)}${u.length?' Gebraucht für: '+u.map(p=>p.n).join(', ')+'.':''}</small></label></li>`}).join('')}</ul></div>`).join('')}
+  <div class="panel">${Object.keys(KIND).map(k=>`<div class="tsec"><h3>${KIND[k]}</h3><p>${desc[k]}</p><ul class="cl">${bike.tools.filter(id=>TOOLS[id].k===k).map(id=>{const u=usedBy(id);
+   return `<li><input type="checkbox" id="t-${id}" data-own="${id}"${owned.has(id)?' checked':''}><label for="t-${id}">${esc(TOOLS[id].n)}<small>${esc(td(id))}${u.length?' Gebraucht für: '+u.map(p=>p.n).join(', ')+'.':''}</small></label></li>`}).join('')}</ul></div>`).join('')}
   <div class="btnrow"><button class="btn" data-act="mdshop">Einkaufsliste kopieren</button><button class="btn ghost" data-act="mdtools">Ganze Liste als Markdown</button></div></div>`;
 }
 
 /* ======================= BEGRIFFE ======================= */
 function renderGloss(){
   $('#v-gloss').innerHTML=`<div class="vhead"><h2>Begriffe</h2><p>Fachwörter, die in den Anleitungen vorkommen. Im Text sind sie gepunktet unterstrichen und lassen sich antippen.</p></div>
-  <div class="panel"><dl class="gl">${Object.keys(GLOSS).sort((a,b)=>a.localeCompare(b,'de')).map(k=>`<dt id="gl-${esc(k)}">${esc(k)}</dt><dd>${esc(GLOSS[k])}</dd>`).join('')}</dl></div>`;
+  <div class="panel"><dl class="gl">${bike.gloss.slice().sort((a,b)=>a.localeCompare(b,'de')).map(k=>`<dt id="gl-${esc(k)}">${esc(k)}</dt><dd>${esc(ALLGLOSS[k])}</dd>`).join('')}</dl></div>`;
 }
 
 /* ======================= MARKDOWN ======================= */
 function mdPart(p){
-  let s=`# ${p.n}\n\n_${p.g}_\n\n## Funktion\n\n${plain(p.what)}\n\n${plain(p.how)}\n\n## Verschleiß erkennen\n\n${p.wear.map(w=>'- '+plain(w)).join('\n')}\n\n## Wartung\n`;
+  let s=`# ${p.n}\n\n_${bike.n} · ${p.g}_\n\n## Funktion\n\n${plain(p.what)}\n\n${plain(p.how)}\n\n## Verschleiß erkennen\n\n${p.wear.map(w=>'- '+plain(w)).join('\n')}\n\n## Wartung\n`;
   p.tasks.forEach(t=>{s+=`\n### ${t.t}\n\nSchwierigkeit: ${LVN[t.lv]} · Intervall: ${t.iv}\n\n${t.steps.map((x,i)=>`${i+1}. ${plain(x)}`).join('\n')}\n`;
     if(t.tools.length)s+=`\nWerkzeug: ${t.tools.map(id=>TOOLS[id].n).join(', ')}\n`;if(t.note)s+=`\n> ${plain(t.note)}\n`});
   s+=`\n## Lieber in die Werkstatt, wenn …\n\n${plain(p.shop)}\n`;return s;
 }
 function mdInsp(){
   const d=new Date().toLocaleDateString('de-DE');
-  return `# Inspektion – Checkliste\n\nStand: ${d}\n\n`+INSP.map((s,i)=>`## ${i+1}. ${s.t}\n\n${s.checks.map((c,j)=>`- [${checks[i+'-'+j]?'x':' '}] ${c}`).join('\n')}\n${s.tools.length?`\nWerkzeug: ${s.tools.map(id=>TOOLS[id].n).join(', ')}\n`:''}${s.note?`\n> ${s.note}\n`:''}`).join('\n');
+  return `# Inspektion – Checkliste\n\nRad: ${bike.n} · Stand: ${d}\n\n`+INSP.map((s,i)=>`## ${i+1}. ${s.t}\n\n${s.checks.map((c,j)=>`- [${checks[i+'-'+j]?'x':' '}] ${c}`).join('\n')}\n${s.tools.length?`\nWerkzeug: ${s.tools.map(id=>TOOLS[id].n).join(', ')}\n`:''}${s.note?`\n> ${s.note}\n`:''}`).join('\n');
 }
 function mdTools(onlyMissing){
   return `# ${onlyMissing?'Einkaufsliste Werkzeug':'Werkzeug'}\n\n`+Object.keys(KIND).map(k=>{
-    const ids=Object.keys(TOOLS).filter(id=>TOOLS[id].k===k&&(!onlyMissing||!owned.has(id)));
+    const ids=bike.tools.filter(id=>TOOLS[id].k===k&&(!onlyMissing||!owned.has(id)));
     if(!ids.length)return '';
-    return `## ${KIND[k]}\n\n${ids.map(id=>`- [${owned.has(id)?'x':' '}] ${TOOLS[id].n} – ${TOOLS[id].d}`).join('\n')}\n`}).filter(Boolean).join('\n');
+    return `## ${KIND[k]}\n\n${ids.map(id=>`- [${owned.has(id)?'x':' '}] ${TOOLS[id].n} – ${td(id)}`).join('\n')}\n`}).filter(Boolean).join('\n');
 }
+
+/* ======================= START ======================= */
+function renderStart(){
+  $('#v-start').innerHTML=`<div class="vhead"><h2>Welches Rad hast du?</h2>
+  <p>Bauteile, Wartung, Inspektion, Werkzeug und Begriffe passen sich an dein Rad an. Wechseln kannst du jederzeit oben über „Rad wechseln".</p></div>
+  <div class="panel"><ul class="bikes">${Object.values(BIKES).map(b=>{const on=bike===b;
+   return `<li><button class="bikecard${on?' on':''}" data-pick="${b.id}"${on?' aria-current="true"':''}>${ICON[b.id]}<span class="bt"><span class="bn">${esc(b.n)}</span><span class="bd">${esc(b.desc)}</span>
+   <span class="bf">${b.facts.map(f=>`<span>${esc(f)}</span>`).join('')}</span>${on?'<span class="act">Aktuell ausgewählt</span>':''}</span></button></li>`}).join('')}</ul>
+  <p class="disclaimer">Deine Wahl bleibt in diesem Browser gespeichert. Den Fortschritt der Inspektion merkt sich die App für jedes Rad getrennt, abgehakte Werkzeuge gelten für alle Räder.</p></div>`;
+}
+function setBike(id){
+  bike=BIKES[id]||null;
+  PARTS=bike?bike.parts:[];INSP=bike?bike.insp:[];GROUPS=bike?bike.groups:[];
+  byId=Object.fromEntries(PARTS.map(p=>[p.id,p]));
+  checks=bike?store.get(bike.ck,{}):{};
+  openSteps.clear();current=null;
+  $('#sub').textContent=bike?bike.sub:'Wähle dein Rad';
+  $('.tabs').hidden=!bike;
+  svg.querySelectorAll('.art').forEach(g=>g.dataset.bike===id?g.removeAttribute('display'):g.setAttribute('display','none'));
+  svg.setAttribute('aria-label',bike?bike.aria:'Schematische Seitenansicht eines Fahrrads');
+  $('#v-rad').classList.remove('detail');highlight(null);setVB(BASE.slice());
+  buildLabels();
+}
+function go(hash){if(location.hash===hash)route();else location.hash=hash}
 
 /* ======================= ROUTER ======================= */
 function route(){
-  const h=(location.hash||'#/rad').slice(2).split('/');const v=h[0]||'rad';
-  const map={rad:'v-rad',inspektion:'v-insp',werkzeug:'v-tools',begriffe:'v-gloss'};
+  let h=(location.hash||'#/rad').slice(2).split('/');
+  if(!bike&&h[0]!=='start'){try{history.replaceState(null,'','#/start')}catch(e){}h=['start']}
+  const v=h[0]||'rad';
+  const map={start:'v-start',rad:'v-rad',inspektion:'v-insp',werkzeug:'v-tools',begriffe:'v-gloss'};
   const vid=map[v]||'v-rad';
   document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!==vid);
+  $('#switch').hidden=!bike||vid==='v-start';
   document.querySelectorAll('.tabs button').forEach(b=>b.toggleAttribute('aria-current',b.dataset.go==='#/'+(map[v]?v:'rad')));
   document.querySelectorAll('.tabs button[aria-current]').forEach(b=>b.setAttribute('aria-current','page'));
   if(vid==='v-rad'){
+    if(labelsDirty)sizeLabels();
     const p=byId[h[1]];const rad=$('#v-rad');
     const wasDetail=rad.classList.contains('detail');
     const before=stage.getBoundingClientRect();
@@ -957,6 +1603,7 @@ function route(){
       animVB(BASE);
     }
   }
+  if(vid==='v-start')renderStart();
   if(vid==='v-insp')renderInsp();
   if(vid==='v-tools')renderTools();
   if(vid==='v-gloss')renderGloss();
@@ -967,20 +1614,22 @@ addEventListener('resize',()=>{if(current)setVB(targetFor(byId[current]))});
 
 /* ======================= EVENTS ======================= */
 document.addEventListener('click',e=>{
-  const go=e.target.closest('[data-go]');
-  if(go){
-    if(go.dataset.tabset)dtab=1;
-    location.hash=go.dataset.go;closeSheet();return;
+  const pick=e.target.closest('[data-pick]');
+  if(pick){store.set('bike',pick.dataset.pick);setBike(pick.dataset.pick);toast(bike.n+' gewählt');go('#/rad');return}
+  const lnk=e.target.closest('[data-go]');
+  if(lnk){
+    if(lnk.dataset.tabset)dtab=1;
+    location.hash=lnk.dataset.go;closeSheet();return;
   }
   const part=e.target.closest('svg [data-part]');
   if(part){location.hash='#/rad/'+part.dataset.part;return}
   const tab=e.target.closest('[data-tab]');
   if(tab){dtab=+tab.dataset.tab;renderDetail(byId[current]);return}
   const term=e.target.closest('.term');
-  if(term){const k=term.dataset.term;openSheet(`<h3>${esc(k)}</h3><p>${esc(GLOSS[k]||'Keine Erklärung hinterlegt.')}</p><button class="btn ghost" data-act="close">Schließen</button>`);return}
+  if(term){const k=term.dataset.term;openSheet(`<h3>${esc(k)}</h3><p>${esc(ALLGLOSS[k]||'Keine Erklärung hinterlegt.')}</p><button class="btn ghost" data-act="close">Schließen</button>`);return}
   const tl=e.target.closest('[data-tool]');
   if(tl){const id=tl.dataset.tool,t=TOOLS[id];
-    openSheet(`<h3>${esc(t.n)}</h3><p>${esc(t.d)}</p><p style="color:var(--ink2);font-size:14px">${esc(KIND[t.k])}</p>
+    openSheet(`<h3>${esc(t.n)}</h3><p>${esc(td(id))}</p><p style="color:var(--ink2);font-size:14px">${esc(KIND[t.k])}</p>
     <ul class="cl"><li><input type="checkbox" id="s-${id}" data-own="${id}"${owned.has(id)?' checked':''}><label for="s-${id}">Hab ich</label></li></ul>
     <div class="btnrow"><button class="btn ghost" data-act="close">Schließen</button></div>`);return}
   const act=e.target.closest('[data-act]');
@@ -990,7 +1639,7 @@ document.addEventListener('click',e=>{
     if(a==='mdinsp')copyMd(mdInsp(),'inspektion.md');
     if(a==='mdtools')copyMd(mdTools(false),'werkzeug.md');
     if(a==='mdshop')copyMd(mdTools(true),'einkaufsliste.md');
-    if(a==='resetinsp'){if(confirm('Alle Häkchen der Inspektion zurücksetzen?')){checks={};store.set('checks',checks);renderInsp()}}
+    if(a==='resetinsp'){if(confirm('Alle Häkchen der Inspektion zurücksetzen?')){checks={};store.set(bike.ck,checks);renderInsp()}}
     if(a==='dlmd'&&dl){dl.save({filename:act.dataset.fn,data:copyMd.last}).catch(()=>toast('Speichern abgebrochen'))}
   }
 });
@@ -1006,13 +1655,14 @@ document.addEventListener('change',e=>{
     document.querySelectorAll(`.chip[data-tool="${o}"]`).forEach(x=>x.classList.toggle('have',owned.has(o)));
     if(!$('#v-tools').hidden)renderTools();return}
   const c=e.target.dataset&&e.target.dataset.chk;
-  if(c){checks[c]=e.target.checked;if(!e.target.checked)delete checks[c];store.set('checks',checks);
+  if(c){checks[c]=e.target.checked;if(!e.target.checked)delete checks[c];store.set(bike.ck,checks);
     const i=+c.split('-')[0];openSteps.add(i);renderInsp();}
 });
 document.addEventListener('toggle',e=>{
   const d=e.target;if(d.classList&&d.classList.contains('step')){const i=+d.dataset.step;d.open?openSteps.add(i):openSteps.delete(i)}
 },true);
 
+setBike(store.get('bike',null));
 route();
 initDownloads();
 if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
