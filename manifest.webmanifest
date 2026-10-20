@@ -1,7 +1,7 @@
 {
   "name": "Fahrrad-Werkstatt",
   "short_name": "Werkstatt",
-  "description": "Bauteile, Wartung und Inspektion für Gravel- und Rennräder",
+  "description": "Bauteile, Wartung und Inspektion für Gravel- und Rennräder und das Brompton C Line",
   "start_url": "./#/rad",
   "scope": "./",
   "display": "standalone",
